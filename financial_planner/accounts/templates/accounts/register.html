@@ -1,6 +1,27 @@
-<h2>Register</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-</form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{% static 'accounts/css/styles.css' %}">
+</head>
+<body>
+    <div class="top-right-button">
+        <a href="{% url 'home' %}">Home</a>
+    </div>
+    <div class="form-container">
+        <h2>Register</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Register</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            <a href="{% url 'login' %}">Already have an account? Login</a>
+        </div>
+    </div>
+</body>
+</html>
