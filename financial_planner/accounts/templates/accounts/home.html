@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            background-color: #333;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .navbar a {
+            color: white;
+            padding: 10px;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+        .navbar a:hover {
+            background-color: #575757;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Register</a>
+    </div>
+
+    <div style="margin-top: 60px; text-align: center;">
+        <h1>Welcome to Intelligent Financial Planning</h1>
+        <p>Your personal finance assistant to plan and manage your finances intelligently!</p>
+    </div>
+</body>
+</html>

@@ -4,6 +4,9 @@ from django.contrib.auth import authenticate, login
 from .forms import UserRegistrationForm
 from django.contrib import messages
 
+def home(request):
+    return render(request, 'accounts/home.html')
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
