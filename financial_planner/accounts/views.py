@@ -14,12 +14,6 @@ def home(request):
 def profile(request):
     return render(request, 'accounts/profile.html')
 
-def add_expenses(request):
-    return render(request, 'accounts/add_expenses.html')
-
-def view_expenses(request):
-    return render(request, 'accounts/view_expenses.html')
-
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -54,6 +48,7 @@ def login_view(request):
 
     return render(request, 'accounts/login.html')
 
+@login_required
 def add_expenses(request):
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
@@ -72,6 +67,7 @@ def add_expenses(request):
         form = ExpenseForm()
 
     return render(request, 'accounts/add_expenses.html', {'form': form})
+
 @login_required
 def view_expenses(request):
     expenses = Expense.objects.filter(user=request.user)
