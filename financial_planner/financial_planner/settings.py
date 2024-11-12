@@ -120,8 +120,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
+LOGIN_REDIRECT_URL = 'profile'  # Redirect to the profile page after login
+
+LOGOUT_REDIRECT_URL = 'login'  # Redirect to the login page after logout
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

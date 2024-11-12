@@ -5,23 +5,172 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <link rel="stylesheet" href="{% static 'accounts/css/styles.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background: #ffffff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-container label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-container input {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-container button {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .top-right-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .top-right-button a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            left: 200px;
+            top: 17%;
+        }
+    </style>
 </head>
 <body>
+
     <div class="top-right-button">
         <a href="{% url 'home' %}">Home</a>
     </div>
+
     <div class="form-container">
         <h2>Register</h2>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            
+            <!-- Username Input -->
+            <label for="username">Username:</label>
+            {{ form.username }}
+
+            <!-- Password Input -->
+            <label for="password">Password:</label>
+            <div class="password-container">
+                {{ form.password }}
+                <span class="password-toggle" id="toggle-password-register">🙈</span>
+            </div>
+
+            <!-- Confirm Password Input -->
+            <label for="confirm_password">Confirm Password:</label>
+            <div class="password-container">
+                {{ form.confirm_password }}
+                <span class="password-toggle" id="toggle-confirm-password-register">🙈</span>
+            </div>
+
             <button type="submit">Register</button>
         </form>
 
-        <div style="margin-top: 20px;">
-            <a href="{% url 'login' %}">Already have an account? Login</a>
+        <div class="footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const togglePassword = document.getElementById('toggle-password-register');
+            const passwordInput = document.querySelector('input[name="password"]');
+            const toggleConfirmPassword = document.getElementById('toggle-confirm-password-register');
+            const confirmPasswordInput = document.querySelector('input[name="confirm_password"]');
+
+            togglePassword.addEventListener('click', function () {
+                // Toggle password visibility
+                if (passwordInput.type === "password") {
+                    passwordInput.type = "text";
+                    togglePassword.textContent = "👁️👁️";  // Change icon
+                } else {
+                    passwordInput.type = "password";
+                    togglePassword.textContent = "🙈";  // Change icon
+                }
+            });
+
+            toggleConfirmPassword.addEventListener('click', function () {
+                // Toggle confirm password visibility
+                if (confirmPasswordInput.type === "password") {
+                    confirmPasswordInput.type = "text";
+                    toggleConfirmPassword.textContent = "👁️👁️";  // Change icon
+                } else {
+                    confirmPasswordInput.type = "password";
+                    toggleConfirmPassword.textContent = "🙈";  // Change icon
+                }
+            });
+        });
+    </script>
 </body>
 </html>

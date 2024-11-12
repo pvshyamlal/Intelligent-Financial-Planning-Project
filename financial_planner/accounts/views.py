@@ -1,11 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from django.contrib import messages
 
 def home(request):
     return render(request, 'accounts/home.html')
+
+@login_required
+def profile(request):
+    return render(request, 'accounts/profile.html')
 
 def register(request):
     if request.method == 'POST':
@@ -28,7 +33,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Login successful!')
-            return redirect('home')  # Redirect to home page after login
+            return redirect('profile')  # Redirect to home page after login
         else:
             messages.error(request, 'Invalid username or password.')
     return render(request, 'accounts/login.html')

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+        }
+        .top-bar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        .profile {
+            position: relative;
+        }
+        .profile-bubble {
+            background-color: white;
+            color: black;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            width: 40px;
+            height: 40px;
+        }
+        .dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            display: none;
+            width: 200px;
+            z-index: 10;
+        }
+        .profile.active .dropdown {
+            display: block;
+        }
+        .dropdown p {
+            margin: 0;
+            margin-bottom: 10px;
+            color: black;
+            font-size: 14px;
+        }
+        .dropdown a {
+            text-decoration: none;
+            color: #007bff;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .dropdown a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="{% url 'home' %}">Home</a>
+        {% if user.is_authenticated %}
+            <div class="profile">
+                <div class="profile-bubble" id="profile-bubble">{{ user.username|slice:":1" }}</div>
+                <div class="dropdown" id="dropdown">
+                    <p>Welcome, {{ user.username }}</p>
+                    <!-- Logout form with POST method -->
+                    <form action="{% url 'logout' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit">Logout</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div>
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="content">
+        <h1>Your Profile</h1>
+        <p>Welcome to your profile page, {{ user.username }}! Here, you can view and manage your profile details.</p>
+        <!-- Add more user profile related content here -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const profileBubble = document.getElementById('profile-bubble');
+            const dropdown = document.getElementById('dropdown');
+            const profile = document.querySelector('.profile');
+
+            if (profileBubble) {
+                // Toggle dropdown visibility on click
+                profileBubble.addEventListener('click', function () {
+                    profile.classList.toggle('active');
+                });
+            }
+
+            // Close dropdown if clicking outside of the profile
+            document.addEventListener('click', function (event) {
+                if (!profile.contains(event.target)) {
+                    profile.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

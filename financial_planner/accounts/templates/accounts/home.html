@@ -5,37 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <style>
+        /* Set background image */
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://res.cloudinary.com/dwwpovlcs/image/upload/v1731409331/Picture1_rjm3li.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
+
+        /* Navbar Styling */
         .navbar {
             position: fixed;
             top: 0;
             right: 0;
             padding: 10px;
-            background-color: #333;
+            background-color: rgba(187, 234, 31); /* Slight transparency for better readability */
             width: 100%;
             display: flex;
             justify-content: flex-end;
         }
+
         .navbar a {
-            color: white;
-            padding: 10px;
+            color: rgb(231, 15, 15);
+            padding: 10px 20px;
             text-decoration: none;
             margin-left: 20px;
+            font-weight: bold;
         }
+
         .navbar a:hover {
-            background-color: #575757;
+            background-color: #688d10;
+            border-radius: 5px;
+        }
+
+        /* Content Styling */
+        .content {
+            text-align: center;
+            background-color: rgba(104, 141, 16, 0.91);
+            color: black;
+            margin-top: 120px; /* Give some space below the fixed navbar */
+            padding: 20px;
+            max-width: 800px; /* Set max-width of the content */
+            margin-left: auto; /* Center horizontally */
+            margin-right: auto; /* Center horizontally */
+            border-radius: 10px; /* Optional: for rounded corners */
+        }
+
+        .content h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .content p {
+            font-size: 18px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
+    <!-- Navbar with links for login and register -->
     <div class="navbar">
         <a href="{% url 'login' %}">Login</a>
         <a href="{% url 'register' %}">Register</a>
     </div>
 
-    <div style="margin-top: 60px; text-align: center;">
+    <!-- Main content area with title and description -->
+    <div class="content">
         <h1>Welcome to Intelligent Financial Planning</h1>
         <p>Your personal finance assistant to plan and manage your finances intelligently!</p>
     </div>
