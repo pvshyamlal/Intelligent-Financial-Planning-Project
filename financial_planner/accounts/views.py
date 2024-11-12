@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm
 from django.contrib import messages
+from .models import Expense
+from .forms import ExpenseForm
 
 def home(request):
     return render(request, 'accounts/home.html')
@@ -51,3 +53,26 @@ def login_view(request):
             messages.error(request, 'Password is incorrect.')
 
     return render(request, 'accounts/login.html')
+
+def add_expenses(request):
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST)
+        if form.is_valid():
+            # Associate the logged-in user with the expense
+            expense = form.save(commit=False)
+            expense.user = request.user  # Link the current logged-in user
+            expense.save()
+
+            # Add a success message
+            messages.success(request, 'Expense added successfully!')
+
+            # Redirect to the same page to display the success message
+            return redirect('add_expenses')
+    else:
+        form = ExpenseForm()
+
+    return render(request, 'accounts/add_expenses.html', {'form': form})
+@login_required
+def view_expenses(request):
+    expenses = Expense.objects.filter(user=request.user)
+    return render(request, 'accounts/view_expenses.html', {'expenses': expenses})

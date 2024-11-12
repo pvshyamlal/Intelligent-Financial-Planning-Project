@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from .models import Expense
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(
@@ -25,3 +26,10 @@ class UserRegistrationForm(forms.ModelForm):
         if password and confirm_password and password != confirm_password:
             self.add_error("confirm_password", "Passwords do not match.")
         return cleaned_data
+
+class ExpenseForm(forms.ModelForm):
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+
+    class Meta:
+        model = Expense
+        fields = ['date', 'description', 'amount']

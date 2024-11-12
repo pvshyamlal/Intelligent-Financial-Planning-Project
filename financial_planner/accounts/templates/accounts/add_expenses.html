@@ -4,9 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Expenses</title>
+    <style>
+        .form-container {
+            margin: 20px auto;
+            max-width: 400px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-container input, .form-container textarea {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-container button {
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background: #0056b3;
+        }
+        .form-container .btn-secondary {
+            background: #f4f4f4;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .form-container .btn-secondary:hover {
+            background: #e4e4e4;
+        }
+        
+        /* Success message styling */
+        .alert-success {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Add your expenses here</h1>
-    <p>Please fill out the form below to add your expenses.</p>
+
+    <!-- Success message display -->
+    {% if messages %}
+        <div class="alert-success">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="form-container">
+        <h2>Add Expenses</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit</button>
+            <a href="{% url 'view-expenses' %}" class="btn-secondary">View Expenses</a>
+        </form>
+    </div>
+
 </body>
 </html>
