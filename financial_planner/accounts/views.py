@@ -12,6 +12,12 @@ def home(request):
 def profile(request):
     return render(request, 'accounts/profile.html')
 
+def add_expenses(request):
+    return render(request, 'accounts/add_expenses.html')
+
+def view_expenses(request):
+    return render(request, 'accounts/view_expenses.html')
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
