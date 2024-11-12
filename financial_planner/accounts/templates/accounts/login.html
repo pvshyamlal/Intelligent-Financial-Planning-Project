@@ -95,40 +95,40 @@
             overflow: hidden;
             background: #66ff66;
             color: ghostwhite;
-            }
+        }
 
-            button span {
+        button span {
             position: relative;
             z-index: 10;
             transition: color 0.4s;
-            }
+        }
 
-            button:hover span {
+        button:hover span {
             color: black;
-            }
+        }
 
-            button::before,
-            button::after {
+        button::before,
+        button::after {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
-            }
+        }
 
-            button::before {
+        button::before {
             content: "";
             background: #000;
             width: 120%;
             left: -10%;
             transform: skew(30deg);
             transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
-            }
+        }
 
-            button:hover::before {
+        button:hover::before {
             transform: translate3d(100%, 0, 0);
-            }
+        }
 
         .footer {
             text-align: center;
@@ -155,6 +155,26 @@
             left: 200px;
             top: 17%;
         }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -165,6 +185,16 @@
 
     <div class="form-container">
         <h2>Login</h2>
+
+        <!-- Messages for errors and success -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags %}{{ message.tags }}-message{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <form method="post">
             {% csrf_token %}
             

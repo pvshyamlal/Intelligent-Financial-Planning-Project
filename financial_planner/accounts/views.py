@@ -29,11 +29,19 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+
+        # Check if the username exists in the database
+        if not User.objects.filter(username=username).exists():
+            messages.error(request, 'Username is incorrect.')
+            return render(request, 'accounts/login.html')
+
+        # Authenticate the user
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             messages.success(request, 'Login successful!')
-            return redirect('profile')  # Redirect to home page after login
+            return redirect('profile')  # Redirect to profile page after login
         else:
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, 'Password is incorrect.')
+
     return render(request, 'accounts/login.html')
