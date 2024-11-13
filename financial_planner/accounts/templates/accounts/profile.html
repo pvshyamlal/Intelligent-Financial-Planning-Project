@@ -47,8 +47,8 @@
         /* Main Content Area */
         .main-content {
             flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .top-bar {
@@ -120,14 +120,20 @@
         .dropdown a:hover {
             text-decoration: underline;
         }
+
+        /* Frame Area */
+        .frame-container {
+            flex-grow: 1;
+            border: none;
+        }
     </style>
 </head>
 <body>
     <!-- Left Navigation Bar -->
     <div class="nav-bar">
         <div class="nav-title">Menu</div>
-        <a href="{% url 'add_expenses' %}">Add New Expenses</a>
-        <a href="{% url 'view_expenses' %}">View Expenses</a>
+        <a href="{% url 'add_expenses' %}" target="content-frame">Add New Expenses</a>
+        <a href="{% url 'view_expenses' %}" target="content-frame">View Expenses</a>
     </div>
 
     <!-- Main Content Area -->
@@ -154,11 +160,8 @@
             {% endif %}
         </div>
 
-        <div class="content">
-            <h1>Your Profile</h1>
-            <p>Welcome to your profile page, {{ user.username }}! Here, you can view and manage your profile details.</p>
-            <!-- Add more user profile related content here -->
-        </div>
+        <!-- Frame Area for Loading Pages -->
+        <iframe name="content-frame" class="frame-container"></iframe>
     </div>
 
     <script>

@@ -122,6 +122,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+X_FRAME_OPTIONS = 'ALLOWALL'  # Allow embedding the site in an iframe
+
 LOGIN_REDIRECT_URL = 'profile'  # Redirect to the profile page after login
 
 LOGOUT_REDIRECT_URL = 'login'  # Redirect to the login page after logout
