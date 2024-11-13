@@ -1,11 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm
+from django.http import JsonResponse, HttpResponse
+from .forms import UserRegistrationForm, ExpenseForm
 from django.contrib import messages
 from .models import Expense
-from .forms import ExpenseForm
+from django.views.decorators.csrf import csrf_exempt
 
 def home(request):
     return render(request, 'accounts/home.html')
@@ -72,3 +73,29 @@ def add_expenses(request):
 def view_expenses(request):
     expenses = Expense.objects.filter(user=request.user)
     return render(request, 'accounts/view_expenses.html', {'expenses': expenses})
+
+@login_required
+def edit_expense(request, expense_id):
+    """Edit an existing expense."""
+    expense = get_object_or_404(Expense, id=expense_id, user=request.user)
+
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST, instance=expense)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Expense updated successfully!')
+            return redirect('view_expenses')
+    else:
+        form = ExpenseForm(instance=expense)
+
+    return render(request, 'accounts/edit_expense.html', {'form': form, 'expense': expense})
+
+@login_required
+@csrf_exempt
+def delete_expense(request, expense_id):
+    try:
+        expense = Expense.objects.get(id=expense_id, user=request.user)
+        expense.delete()
+        return JsonResponse({"success": True}, status=200)
+    except Expense.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Expense not found"}, status=404)

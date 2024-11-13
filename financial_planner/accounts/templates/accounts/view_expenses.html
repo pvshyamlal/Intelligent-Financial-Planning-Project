@@ -21,6 +21,21 @@
             background: #007bff;
             color: white;
         }
+        .action-buttons button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .edit-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -31,21 +46,65 @@
                 <th>Date</th>
                 <th>Description</th>
                 <th>Amount (INR)</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for expense in expenses %}
-                <tr>
+                <tr id="expense-row-{{ expense.id }}" data-expense-id="{{ expense.id }}">
                     <td>{{ expense.date }}</td>
                     <td>{{ expense.description }}</td>
                     <td>{{ expense.amount }}</td>
+                    <td class="action-buttons">
+                        <!-- Edit Button -->
+                        <a href="{% url 'edit_expense' expense.id %}">
+                            <button class="edit-button">Edit</button>
+                        </a>
+
+                        <!-- Delete Button -->
+                        <button class="delete-button delete-expense-btn">Delete</button>
+                    </td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="3" style="text-align: center;">No expenses found.</td>
+                    <td colspan="4" style="text-align: center;">No expenses found.</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- CSRF Token -->
+    <input type="hidden" id="csrf-token" value="{% csrf_token %}">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const csrfToken = document.getElementById('csrf-token').value;
+
+            // Add event listeners to all delete buttons
+            document.querySelectorAll('.delete-expense-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const rowElement = this.closest('tr');
+                    const expenseId = rowElement.dataset.expenseId;
+
+                    fetch(`/delete_expense/${expenseId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Remove the row from the table
+                            rowElement.remove();
+                        } else {
+                            console.error('Failed to delete expense');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+    </script>
 </body>
 </html>

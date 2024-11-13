@@ -9,6 +9,8 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('home/', views.home, name='home'),  # Homepage
     path('profile/', views.profile, name='profile'),
-    path('add_expenses/', views.add_expenses, name='add_expenses'),  # Changed URL pattern
-    path('view_expenses/', views.view_expenses, name='view_expenses'),  # Changed URL pattern
+    path('add_expenses/', views.add_expenses, name='add_expenses'),
+    path('view_expenses/', views.view_expenses, name='view_expenses'),
+    path('edit_expense/<int:expense_id>/', views.edit_expense, name='edit_expense'),  # New URL for editing an expense
+    path('delete_expense/<int:expense_id>/', views.delete_expense, name='delete_expense'),
 ]
