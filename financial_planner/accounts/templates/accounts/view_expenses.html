@@ -36,10 +36,80 @@
             background-color: #f44336;
             color: white;
         }
+
+        /* Transition effect for deleting rows */
+        .fade-out {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        /* Success message styling with slide-in and slide-out animation */
+        .alert-success {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slide-in 0.5s ease-out, slide-out 0.5s ease-in 2.5s forwards;
+        }
+
+        @keyframes slide-in {
+            from {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slide-out {
+            from {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+            to {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+        }
+
+        /* Failure message styling with transition */
+        .alert-danger {
+            background-color: #f44336;
+        }
+
+        /* Visible state for messages */
+        .show-alert {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
     <h1 style="text-align: center;">Your Expenses</h1>
+
+    <!-- Displaying messages -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                {% if message.tags == "success" %}
+                    <div class="alert-success">{{ message }}</div>
+                {% else %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <table>
         <thead>
             <tr>
@@ -80,28 +150,43 @@
         document.addEventListener('DOMContentLoaded', () => {
             const csrfToken = document.getElementById('csrf-token').value;
 
+            // Add fade-in effect to success/failure messages
+            const alertMessages = document.querySelectorAll('.alert');
+            alertMessages.forEach(alert => {
+                alert.classList.add('show-alert');
+                setTimeout(() => {
+                    alert.classList.remove('show-alert');
+                }, 3000); // Hide message after 3 seconds
+            });
+
             // Add event listeners to all delete buttons
             document.querySelectorAll('.delete-expense-btn').forEach(button => {
                 button.addEventListener('click', function () {
                     const rowElement = this.closest('tr');
                     const expenseId = rowElement.dataset.expenseId;
 
-                    fetch(`/delete_expense/${expenseId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': csrfToken,
-                            'Content-Type': 'application/json',
-                        },
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            // Remove the row from the table
-                            rowElement.remove();
-                        } else {
-                            console.error('Failed to delete expense');
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+                    // Add fade-out effect for deleting the row
+                    rowElement.classList.add('fade-out');
+
+                    // Wait for the transition to complete before removing the row
+                    setTimeout(() => {
+                        fetch(`/delete_expense/${expenseId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrfToken,
+                                'Content-Type': 'application/json',
+                            },
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                // Remove the row after fade-out
+                                rowElement.remove();
+                            } else {
+                                console.error('Failed to delete expense');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }, 500); // Matches the CSS transition duration
                 });
             });
         });

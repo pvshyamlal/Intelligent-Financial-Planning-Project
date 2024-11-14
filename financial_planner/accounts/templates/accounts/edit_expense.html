@@ -75,9 +75,57 @@
         .form-container a:hover {
             text-decoration: underline;
         }
+
+        /* Sliding message styles */
+        .alert-success {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slide-in 0.5s ease-out, slide-out 0.5s ease-in 2.5s forwards;
+        }
+
+        @keyframes slide-in {
+            from {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slide-out {
+            from {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+            to {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Success message display -->
+    {% if messages %}
+        <div class="alert-success" id="success-message">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div class="form-container">
         <h1>Edit Expense</h1>
         <form method="POST">
@@ -95,5 +143,20 @@
         </form>
         <a href="{% url 'view_expenses' %}">Cancel</a>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const successMessage = document.getElementById('success-message');
+
+            if (successMessage) {
+                // Automatically remove the element from the DOM after the animation ends
+                successMessage.addEventListener('animationend', (event) => {
+                    if (event.animationName === 'slide-out') {
+                        successMessage.remove();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
