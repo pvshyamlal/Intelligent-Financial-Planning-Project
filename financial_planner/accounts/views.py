@@ -8,6 +8,7 @@ from .forms import UserRegistrationForm, ExpenseForm
 from .models import Expense
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.messages import get_messages
+from django.db.models import Sum
 from django.middleware import csrf as CsrfViewMiddleware
 
 # Helper function to clear stale messages
@@ -89,6 +90,26 @@ def view_expenses(request):
 
     expenses = Expense.objects.filter(user=request.user)
     return render(request, 'accounts/view_expenses.html', {'expenses': expenses})
+
+@login_required
+def financial_reports(request):
+    # Get all expenses for the logged-in user
+    expenses = Expense.objects.filter(user=request.user)
+    
+    # Calculate total expense (sum of all expenses)
+    total_expense = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # Calculate the number of distinct days (dates) in the expenses
+    distinct_dates = expenses.values('date').distinct().count()
+    
+    # Calculate average daily expense (total_expense / distinct_dates)
+    average_daily_expense = total_expense / distinct_dates if distinct_dates > 0 else 0
+    
+    # Render the financial_reports.html template with the calculated data
+    return render(request, 'accounts/financial_reports.html', {
+        'total_expense': total_expense,
+        'average_daily_expense': average_daily_expense,
+    })
 
 @login_required
 def edit_expense(request, expense_id):
