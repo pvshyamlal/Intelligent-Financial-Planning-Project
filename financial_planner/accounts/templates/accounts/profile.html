@@ -126,6 +126,21 @@
             flex-grow: 1;
             border: none;
         }
+
+        /* Success Message Styling */
+        .messages {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            margin: 10px;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .messages p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -159,6 +174,15 @@
                 </div>
             {% endif %}
         </div>
+
+        <!-- Success Messages Area -->
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <!-- Frame Area for Loading Pages -->
         <iframe name="content-frame" class="frame-container"></iframe>

@@ -8,6 +8,7 @@ from .forms import UserRegistrationForm, ExpenseForm
 from .models import Expense
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.messages import get_messages
+from django.middleware import csrf as CsrfViewMiddleware
 
 # Helper function to clear stale messages
 def clear_stale_messages(request):
@@ -22,6 +23,11 @@ def home(request):
 def profile(request):
     # Clear stale messages when visiting the profile page
     clear_stale_messages(request)
+    
+    # Check for "first_login" parameter and display a welcome message if it's the first login
+    if request.GET.get('first_login'):
+        messages.success(request, f"Welcome back, {request.user.username}!")
+    
     return render(request, 'accounts/profile.html')
 
 def register(request):
@@ -45,16 +51,23 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        if not User.objects.filter(username=username).exists():
-            messages.error(request, 'Username is incorrect.')
-            return render(request, 'accounts/login.html')
+        try:
+            # Validate username exists
+            if not User.objects.filter(username=username).exists():
+                messages.error(request, 'Username is incorrect. Please try again.')
+                return render(request, 'accounts/login.html')
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('/profile?first_login=true')  # Redirect to profile page after successful login
-        else:
-            messages.error(request, 'Password is incorrect.')
+            # Authenticate user
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome back, {user.username}!')  # Add success message
+                return redirect('/profile?first_login=true')  # Redirect to profile page after successful login
+            else:
+                messages.error(request, 'Password is incorrect. Please try again.')
+
+        except CsrfViewMiddleware.CsrfTokenMissing:
+            messages.error(request, 'Something went wrong. Please refresh the page and try again.')
 
     return render(request, 'accounts/login.html')
 
