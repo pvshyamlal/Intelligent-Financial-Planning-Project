@@ -21,13 +21,9 @@ def home(request):
 
 @login_required
 def profile(request):
-    # Clear stale messages when visiting the profile page
-    clear_stale_messages(request)
-    
-    # Check for "first_login" parameter and display a welcome message if it's the first login
+    # Check for "first_login" parameter and display the welcome message
     if request.GET.get('first_login'):
         messages.success(request, f"Welcome back, {request.user.username}!")
-    
     return render(request, 'accounts/profile.html')
 
 def register(request):

@@ -177,7 +177,7 @@
 
         <!-- Success Messages Area -->
         {% if messages %}
-            <div class="messages">
+            <div class="messages" id="welcome-message">
                 {% for message in messages %}
                     <p>{{ message }}</p>
                 {% endfor %}
@@ -193,6 +193,7 @@
             const profileBubble = document.getElementById('profile-bubble');
             const dropdown = document.getElementById('dropdown');
             const profile = document.querySelector('.profile');
+            const welcomeMessage = document.getElementById('welcome-message');
 
             if (profileBubble) {
                 // Toggle dropdown visibility on click
@@ -207,6 +208,15 @@
                     profile.classList.remove('active');
                 }
             });
+
+            // Auto-hide success messages after 2 minutes
+            if (welcomeMessage) {
+                setTimeout(() => {
+                    welcomeMessage.style.transition = "opacity 0.5s";
+                    welcomeMessage.style.opacity = 0;
+                    setTimeout(() => welcomeMessage.remove(), 500); // Remove after fade-out
+                }, 4200); // 2 minutes
+            }
         });
     </script>
 </body>
