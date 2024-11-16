@@ -113,22 +113,18 @@ def financial_reports(request):
 
 @login_required
 def edit_expense(request, expense_id):
-    # Fetch the expense object based on its ID
     expense = get_object_or_404(Expense, id=expense_id, user=request.user)
 
     if request.method == 'POST':
-        # Update the expense object with the submitted values
-        expense.date = request.POST['date']
-        expense.description = request.POST['description']
-        expense.amount = request.POST['amount']
-        expense.save()
+        form = ExpenseForm(request.POST, instance=expense)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Expense updated successfully!")
+            return redirect('view_expenses')
+    else:
+        form = ExpenseForm(instance=expense)
 
-        # Display a success message
-        messages.success(request, "Expense updated successfully!")
-        return redirect('view_expenses')  # Redirect to the 'view_expenses' page
-
-    # Render the edit expense form with the existing expense values
-    return render(request, 'accounts/edit_expense.html', {'expense': expense})
+    return render(request, 'accounts/edit_expense.html', {'form': form, 'expense': expense})
 
 @login_required
 @csrf_exempt

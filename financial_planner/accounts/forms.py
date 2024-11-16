@@ -11,6 +11,7 @@ class UserRegistrationForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={'placeholder': 'Confirm password'}),
         label="Confirm Password"
     )
+
     class Meta:
         model = User
         fields = ['username', 'password']
@@ -27,9 +28,11 @@ class UserRegistrationForm(forms.ModelForm):
             self.add_error("confirm_password", "Passwords do not match.")
         return cleaned_data
 
+
 class ExpenseForm(forms.ModelForm):
     date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    category = forms.ChoiceField(choices=Expense.CATEGORY_CHOICES, widget=forms.Select())
 
     class Meta:
         model = Expense
-        fields = ['date', 'description', 'amount']
+        fields = ['date', 'description', 'amount', 'category']
