@@ -9,6 +9,7 @@ from .models import Expense
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.messages import get_messages
 from django.db.models import Sum
+import json
 from django.middleware import csrf as CsrfViewMiddleware
 
 # Helper function to clear stale messages
@@ -22,7 +23,6 @@ def home(request):
 
 @login_required
 def profile(request):
-    # Check for "first_login" parameter and display the welcome message
     if request.GET.get('first_login'):
         messages.success(request, f"Welcome back, {request.user.username}!")
     return render(request, 'accounts/profile.html')
@@ -32,16 +32,15 @@ def register(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])  # Hash the password
+            user.set_password(form.cleaned_data['password'])
             user.save()
             messages.success(request, 'Registration successful! Please log in.')
-            return redirect('login')  # Redirect to login page after successful registration
+            return redirect('login')
     else:
         form = UserRegistrationForm()
     return render(request, 'accounts/register.html', {'form': form})
 
 def login_view(request):
-    # Clear stale messages when visiting login page
     clear_stale_messages(request)
 
     if request.method == 'POST':
@@ -49,17 +48,15 @@ def login_view(request):
         password = request.POST.get('password')
 
         try:
-            # Validate username exists
             if not User.objects.filter(username=username).exists():
                 messages.error(request, 'Username is incorrect. Please try again.')
                 return render(request, 'accounts/login.html')
 
-            # Authenticate user
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, f'Welcome back, {user.username}!')  # Add success message
-                return redirect('/profile?first_login=true')  # Redirect to profile page after successful login
+                messages.success(request, f'Welcome back, {user.username}!')
+                return redirect('/profile?first_login=true')
             else:
                 messages.error(request, 'Password is incorrect. Please try again.')
 
@@ -77,7 +74,7 @@ def add_expenses(request):
             expense.user = request.user
             expense.save()
             messages.success(request, 'Expense added successfully!')
-            return redirect('add_expenses')  # Redirect to the same page to show the success message
+            return redirect('add_expenses')
     else:
         form = ExpenseForm()
 
@@ -85,7 +82,6 @@ def add_expenses(request):
 
 @login_required
 def view_expenses(request):
-    # Clear stale messages to ensure only relevant messages are shown
     clear_stale_messages(request)
 
     expenses = Expense.objects.filter(user=request.user)
@@ -93,24 +89,41 @@ def view_expenses(request):
 
 @login_required
 def financial_reports(request):
-    # Get all expenses for the logged-in user
-    expenses = Expense.objects.filter(user=request.user)
-    
-    # Calculate total expense (sum of all expenses)
-    total_expense = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
-    
-    # Calculate the number of distinct days (dates) in the expenses
-    distinct_dates = expenses.values('date').distinct().count()
-    
-    # Calculate average daily expense (total_expense / distinct_dates)
+    # Filter expenses for the logged-in user
+    user_expenses = Expense.objects.filter(user=request.user)
+
+    # Aggregate total amounts per category
+    expenses_by_category = user_expenses.values('category').annotate(total=Sum('amount'))
+
+    # Extract categories and amounts
+    categories = []
+    amounts = []
+
+    for expense in expenses_by_category:
+        category = expense['category']
+        total = expense['total']
+
+        # Include all valid categories; handle "Others" separately
+        if category in ['Food', 'Utilities', 'Entertainment', 'Others']:
+            categories.append(category)
+            amounts.append(float(total))  # Convert Decimal to float
+
+    # Calculate totals and averages
+    total_expense = user_expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+
+    # Get the count of unique dates
+    distinct_dates = user_expenses.values('date').distinct().count()
+
+    # Calculate average as sum of amounts / number of unique dates
     average_daily_expense = total_expense / distinct_dates if distinct_dates > 0 else 0
-    
-    # Render the financial_reports.html template with the calculated data
-    return render(request, 'accounts/financial_reports.html', {
+
+    context = {
+        'categories': json.dumps(categories),  # Serialize categories for JavaScript
+        'amounts': json.dumps(amounts),        # Serialize amounts for JavaScript
         'total_expense': total_expense,
         'average_daily_expense': average_daily_expense,
-    })
-
+    }
+    return render(request, 'accounts/financial_reports.html', context)
 @login_required
 def edit_expense(request, expense_id):
     expense = get_object_or_404(Expense, id=expense_id, user=request.user)
