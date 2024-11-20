@@ -25,6 +25,7 @@
         }
         .chart-container {
             margin-top: 40px;
+            text-align: center;
         }
         canvas {
             max-width: 100%;
@@ -51,17 +52,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Include jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Include html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <!-- Include latest html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <div class="report-container">
         <h1>Financial Report</h1>
-        <br>    
         <div class="report-item">
             <strong>Total Expense:</strong> ₹{{ total_expense|floatformat:2 }}
         </div>
-        
         <div class="report-item">
             <strong>Average Daily Expense:</strong> ₹{{ average_daily_expense|floatformat:2 }}
         </div>
@@ -76,22 +75,23 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Data for the chart
-            const categories = JSON.parse('{{ categories|safe }}'); // Parse JSON safely
-            const amounts = JSON.parse('{{ amounts|safe }}'); // Parse JSON safely
+        document.addEventListener('DOMContentLoaded', async function () {
+            const categories = JSON.parse('{{ categories|safe }}');
+            const amounts = JSON.parse('{{ amounts|safe }}');
+            const totalExpense = '{{ total_expense|floatformat:2 }}';
+            const averageExpense = '{{ average_daily_expense|floatformat:2 }}';
 
             // Create the bar chart
             const ctx = document.getElementById('expenseChart').getContext('2d');
             const expenseChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: categories, // X-axis categories
+                    labels: categories,
                     datasets: [{
                         label: 'Expense Amount (₹)',
-                        data: amounts, // Y-axis data
+                        data: amounts,
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.5)', // Color for each bar
+                            'rgba(255, 99, 132, 0.5)',
                             'rgba(54, 162, 235, 0.5)',
                             'rgba(255, 206, 86, 0.5)',
                             'rgba(75, 192, 192, 0.5)'
@@ -131,30 +131,27 @@
                 }
             });
 
-            // Add event listener to download button
-            document.getElementById('downloadPdfBtn').addEventListener('click', function (e) {
-                // Prevent the default behavior (if any) of the button (such as scrolling to the top)
-                e.preventDefault();
-
-                // Generate the PDF
+            // Function to download the PDF
+            document.getElementById('downloadPdfBtn').addEventListener('click', async function () {
                 const { jsPDF } = window.jspdf;
+
+                // Initialize jsPDF and use the default font (supports rupee symbol)
                 const doc = new jsPDF();
 
-                // Add the financial report text
+                // Add the report text
                 doc.setFontSize(16);
                 doc.text('Financial Report', 14, 20);
                 doc.setFontSize(12);
-                doc.text(`Total Expense: ₹{{ total_expense|floatformat:2 }}`, 14, 30);
-                doc.text(`Average Daily Expense: ₹{{ average_daily_expense|floatformat:2 }}`, 14, 40);
+                doc.text(`Total Expense: Rs. ${totalExpense}`, 14, 30);
+                doc.text(`Average Daily Expense: Rs. ${averageExpense}`, 14, 40);
 
-                // Capture the chart using html2canvas
-                html2canvas(document.getElementById('expenseChart')).then(function (canvas) {
-                    const imgData = canvas.toDataURL('image/png');
-                    doc.addImage(imgData, 'PNG', 14, 50, 180, 100); // Add the chart image to the PDF
+                // Capture the chart
+                const canvas = await html2canvas(document.getElementById('expenseChart'));
+                const imgData = canvas.toDataURL('image/png');
+                doc.addImage(imgData, 'PNG', 14, 50, 180, 100);
 
-                    // Save the PDF
-                    doc.save('financial_report.pdf');
-                });
+                // Save the PDF
+                doc.save('financial_report.pdf');
             });
         });
     </script>
