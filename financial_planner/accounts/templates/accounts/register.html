@@ -45,17 +45,10 @@
 
         .form-container input {
             padding: 10px;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 14px;
-        }
-
-        .errorlist {
-            color: red;
-            font-size: 12px;
-            margin-top: -5px;
-            margin-bottom: 10px;
         }
 
         .form-container button {
@@ -67,7 +60,6 @@
             color: white;
             font-size: 14px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
         .form-container button:hover {
@@ -80,6 +72,57 @@
             right: 20px;
         }
 
+        button {
+            outline: none;
+            cursor: pointer;
+            border: none;
+            padding: 0.9rem 2rem;
+            margin: 0;
+            font-family: inherit;
+            font-size: inherit;
+            position: relative;
+            display: inline-block;
+            letter-spacing: 0.05rem;
+            font-weight: 700;
+            font-size: 17px;
+            border-radius: 500px;
+            overflow: hidden;
+            background: #66ff66;
+            color: ghostwhite;
+            }
+
+            button span {
+            position: relative;
+            z-index: 10;
+            transition: color 0.4s;
+            }
+
+            button:hover span {
+            color: black;
+            }
+
+            button::before,
+            button::after {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            }
+
+            button::before {
+            content: "";
+            background: #000;
+            width: 120%;
+            left: -10%;
+            transform: skew(30deg);
+            transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+            }
+
+            button:hover::before {
+            transform: translate3d(100%, 0, 0);
+            }
         .top-right-button a {
             text-decoration: none;
             color: #007bff;
@@ -108,17 +151,8 @@
         .password-toggle {
             cursor: pointer;
             position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 16px;
-            color: #666;
-        }
-
-        @media screen and (max-width: 400px) {
-            .form-container {
-                width: 90%;
-            }
+            left: 200px;
+            top: 17%;
         }
     </style>
 </head>
@@ -136,41 +170,20 @@
             <!-- Username Input -->
             <label for="username">Username:</label>
             {{ form.username }}
-            {% if form.username.errors %}
-                <ul class="errorlist">
-                    {% for error in form.username.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
 
             <!-- Password Input -->
             <label for="password">Password:</label>
             <div class="password-container">
                 {{ form.password }}
-                <span class="password-toggle" id="toggle-password-register" aria-label="Show/Hide password">🙈</span>
+                <span class="password-toggle" id="toggle-password-register">🙈</span>
             </div>
-            {% if form.password.errors %}
-                <ul class="errorlist">
-                    {% for error in form.password.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
 
             <!-- Confirm Password Input -->
             <label for="confirm_password">Confirm Password:</label>
             <div class="password-container">
                 {{ form.confirm_password }}
-                <span class="password-toggle" id="toggle-confirm-password-register" aria-label="Show/Hide confirm password">🙈</span>
+                <span class="password-toggle" id="toggle-confirm-password-register">🙈</span>
             </div>
-            {% if form.confirm_password.errors %}
-                <ul class="errorlist">
-                    {% for error in form.confirm_password.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
 
             <button type="submit"><span>Register</span></button>
         </form>
@@ -189,16 +202,24 @@
 
             togglePassword.addEventListener('click', function () {
                 // Toggle password visibility
-                const isPassword = passwordInput.type === "password";
-                passwordInput.type = isPassword ? "text" : "password";
-                togglePassword.textContent = isPassword ? "👁️" : "🙈";
+                if (passwordInput.type === "password") {
+                    passwordInput.type = "text";
+                    togglePassword.textContent = "👁️👁️";  // Change icon
+                } else {
+                    passwordInput.type = "password";
+                    togglePassword.textContent = "🙈";  // Change icon
+                }
             });
 
             toggleConfirmPassword.addEventListener('click', function () {
                 // Toggle confirm password visibility
-                const isPassword = confirmPasswordInput.type === "password";
-                confirmPasswordInput.type = isPassword ? "text" : "password";
-                toggleConfirmPassword.textContent = isPassword ? "👁️" : "🙈";
+                if (confirmPasswordInput.type === "password") {
+                    confirmPasswordInput.type = "text";
+                    toggleConfirmPassword.textContent = "👁️👁️";  // Change icon
+                } else {
+                    confirmPasswordInput.type = "password";
+                    toggleConfirmPassword.textContent = "🙈";  // Change icon
+                }
             });
         });
     </script>
