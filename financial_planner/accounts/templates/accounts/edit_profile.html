@@ -106,6 +106,26 @@
             margin-bottom: 20px;
         }
 
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -121,14 +141,13 @@
     <!-- Main Content Area -->
     <div class="main-content">
         <div class="top-bar">
-            <!-- Modified this to call hideProfileForm instead of a URL redirection -->
             <a href="javascript:void(0);" onclick="hideProfileForm()">Back to Profile</a>
         </div>
 
-        <!-- Form to Edit Username -->
+        <!-- Forms -->
         <div id="username" class="profile-info">
             <h2>Edit Username</h2>
-            <form method="POST">
+            <form method="POST" onsubmit="handleSubmit(event, this)">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="username_input">Edit Username</label>
@@ -154,27 +173,20 @@
         <!-- Form to Change Password -->
         <div id="password" class="profile-info">
             <h2>Change Password</h2>
-            <form method="POST">
+            <form method="POST" onsubmit="handlePasswordSubmit(event)">
                 {% csrf_token %}
-                
-                <!-- Old Password Field -->
                 <div class="form-group">
                     <label for="old_password_input">Old Password</label>
                     <input type="password" id="old_password_input" name="old_password" placeholder="Enter your old password" required>
                 </div>
-                
-                <!-- New Password Field -->
                 <div class="form-group">
                     <label for="password_input">New Password</label>
                     <input type="password" id="password_input" name="password" placeholder="Enter new password" required>
                 </div>
-                
-                <!-- Confirm New Password -->
                 <div class="form-group">
                     <label for="confirm_password_input">Confirm New Password</label>
                     <input type="password" id="confirm_password_input" name="confirm_password" placeholder="Confirm new password" required>
                 </div>
-                
                 <button type="submit">Save Changes</button>
             </form>
         </div>
@@ -204,29 +216,110 @@
                 <button type="submit">Save Changes</button>
             </form>
         </div>
+
+        <!-- Notification -->
+        <div id="notification" class="notification"></div>
     </div>
 
     <script>
-        // Function to show the respective form based on the clicked navigation item
         function showForm(formId) {
-            // Hide all profile sections
             const forms = document.querySelectorAll('.profile-info');
-            forms.forEach(function(form) {
-                form.classList.remove('active');
-            });
+            forms.forEach(form => form.classList.remove('active'));
+            document.getElementById(formId).classList.add('active');
+        }
+    
+        function hideProfileForm() {
+            const forms = document.querySelectorAll('.profile-info');
+            forms.forEach(form => form.classList.remove('active'));
+        }
+    
+        function handlePasswordSubmit(event) {
+        event.preventDefault();
+        const oldPassword = document.getElementById('old_password_input').value;
+        const newPassword = document.getElementById('password_input').value;
+        const confirmPassword = document.getElementById('confirm_password_input').value;
 
-            // Show the selected form
-            const selectedForm = document.getElementById(formId);
-            selectedForm.classList.add('active');
+        if (newPassword !== confirmPassword) {
+            showNotification('New password and confirm password do not match.', 'error');
+            return;
         }
 
-        // Function to hide the profile editing form and navigation bar when "Back to Profile" is clicked
-        function hideProfileForm() {
-            // Select the parent container for all forms and the navigation bar, and hide them
-            const mainContent = document.querySelector('.main-content');
-            const navBar = document.querySelector('.nav-bar');
-            mainContent.style.display = 'none'; // Hide the entire main content area
-            navBar.style.display = 'none';      // Hide the navigation bar
+        const data = { old_password: oldPassword, new_password: newPassword };
+
+        fetch('/change-password/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                hideProfileForm();
+            } else {
+                showNotification(data.message || 'Failed to update password.', 'error');
+            }
+        })
+        .catch(() => {
+            showNotification('Failed to update password. Please try again.', 'error');
+        });
+    }
+
+
+        
+        function handleSubmit(event, form) {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => {
+            // Check if the response is JSON
+            if (!response.ok) {
+                throw new Error('Failed to submit the form.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle the response
+            if (data.success) {
+                showNotification(data.message, 'success');
+                hideProfileForm(); // Optionally hide the active form
+            } else {
+                showNotification(data.message || 'An error occurred.', 'error');
+            }
+        })
+        .catch(error => {
+            // Handle any unexpected errors
+            showNotification(error.message || 'Failed to process the request.', 'error');
+        });
+    }
+
+
+        // General notification function for consistent formatting
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+    
+            // Apply type class (success/error) and update the message
+            notification.className = `notification ${type}`;
+            notification.innerText = message;
+    
+            // Display notification
+            notification.style.display = 'block';
+    
+            // Auto-hide notification after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
         }
     </script>
 </body>

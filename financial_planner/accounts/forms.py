@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Expense
+from .models import Expense, Profile
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(
@@ -36,3 +36,9 @@ class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
         fields = ['date', 'description', 'amount', 'category']
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['picture', 'additional_info']
