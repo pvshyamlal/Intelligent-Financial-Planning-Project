@@ -87,15 +87,44 @@ def edit_profile(request):
 
 @login_required
 def dashboard(request):
-    # Fetch the user's budget from the database (assuming you have a model for this)
-    user_budget = Profile.objects.filter(user=request.user).first()
-    
+    # Filter expenses for the logged-in user
+    user_expenses = Expense.objects.filter(user=request.user)
+
+    # Aggregate total amounts per category
+    expenses_by_category = user_expenses.values('category').annotate(total=Sum('amount'))
+
+    # Extract categories and amounts
+    categories = []
+    amounts = []
+
+    for expense in expenses_by_category:
+        category = expense['category']
+        total = expense['total']
+
+        # Include all valid categories; handle "Others" separately
+        if category in ['Food', 'Travel', 'Utilities', 'Entertainment', 'Others']:
+            categories.append(category)
+            amounts.append(float(total))  # Convert Decimal to float
+
     context = {
-        'user': request.user,
-        'user_budget': user_budget  # Pass the budget to the template
+        'categories': json.dumps(categories),  # Serialize categories for JavaScript
+        'amounts': json.dumps(amounts),        # Serialize amounts for JavaScript
     }
     return render(request, 'accounts/dashboard.html', context)
 
+@login_required
+def update_username(request):
+    if request.method == "POST" and request.is_ajax():
+        new_username = request.POST.get("username")
+        if new_username:
+            # Update the user's username
+            request.user.username = new_username
+            request.user.save()
+            return JsonResponse({"success": True, "message": "Username updated successfully!"})
+        return JsonResponse({"success": False, "message": "Invalid username."})
+    return JsonResponse({"success": False, "message": "Invalid request."})
+
+@login_required
 def change_password(request):
     if request.method == 'POST':
         # Ensure user is authenticated

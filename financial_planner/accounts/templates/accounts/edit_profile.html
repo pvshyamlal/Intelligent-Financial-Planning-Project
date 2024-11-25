@@ -228,20 +228,47 @@
             const forms = document.querySelectorAll('.profile-info');
             forms.forEach(form => form.classList.remove('active'));
         }
-
+    
+        // Function to handle Edit Username form submission
+        function handleSubmit(event, form) {
+            event.preventDefault();
+            const formData = new FormData(form);
+    
+            fetch(form.action || '/edit-username/', {
+                method: form.method || 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}', // Ensure CSRF token is included
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    hideProfileForm();
+                } else {
+                    showNotification(data.message || 'Failed to update username.', 'error');
+                }
+            })
+            .catch(() => {
+                showNotification('Failed to update username. Please try again.', 'error');
+            });
+        }
+    
+        // Function to handle password update
         function handlePasswordSubmit(event) {
             event.preventDefault();
             const oldPassword = document.getElementById('old_password_input').value;
             const newPassword = document.getElementById('password_input').value;
             const confirmPassword = document.getElementById('confirm_password_input').value;
-
+    
             if (newPassword !== confirmPassword) {
                 showNotification('New password and confirm password do not match.', 'error');
                 return;
             }
-
+    
             const data = { old_password: oldPassword, new_password: newPassword };
-
+    
             fetch('/change-password/', {
                 method: 'POST',
                 body: JSON.stringify(data),
@@ -263,36 +290,8 @@
                 showNotification('Failed to update password. Please try again.', 'error');
             });
         }
-
-        function handleBudgetSubmit(event) {
-            event.preventDefault();
-            const budgetAmount = document.getElementById('budget_input').value;
-
-            const data = { budget: budgetAmount };
-
-            fetch('/set-budget/', {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                    hideProfileForm();
-                } else {
-                    showNotification(data.message || 'Failed to set budget.', 'error');
-                }
-            })
-            .catch(() => {
-                showNotification('Failed to set budget. Please try again.', 'error');
-            });
-        }
-
-        // General notification function for consistent formatting
+    
+        // Function to display notifications
         function showNotification(message, type) {
             const notification = document.getElementById('notification');
     
@@ -309,5 +308,6 @@
             }, 3000);
         }
     </script>
+    
 </body>
 </html>
