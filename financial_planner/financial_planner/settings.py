@@ -55,8 +55,10 @@ ROOT_URLCONF = 'financial_planner.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [
+            BASE_DIR / 'templates',  # Add this line to include a global templates directory
+        ],
+        'APP_DIRS': True,  # This will still look in app's templates directory
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',

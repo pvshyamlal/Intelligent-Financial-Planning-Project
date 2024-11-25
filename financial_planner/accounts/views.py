@@ -7,6 +7,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from .forms import UserRegistrationForm, ExpenseForm, ProfileForm
 from .models import Expense, Profile
+from .models import Profile
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.messages import get_messages
@@ -84,6 +85,17 @@ def edit_profile(request):
 
     return render(request, 'accounts/edit_profile.html', {'user': request.user, 'profile': profile})
 
+@login_required
+def dashboard(request):
+    # Fetch the user's budget from the database (assuming you have a model for this)
+    user_budget = Profile.objects.filter(user=request.user).first()
+    
+    context = {
+        'user': request.user,
+        'user_budget': user_budget  # Pass the budget to the template
+    }
+    return render(request, 'accounts/dashboard.html', context)
+
 def change_password(request):
     if request.method == 'POST':
         # Ensure user is authenticated
@@ -114,6 +126,27 @@ def change_password(request):
 
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
+@login_required
+@csrf_exempt  # Only if you're using non-AJAX POST requests without CSRF token in the frontend
+def set_budget(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            budget_amount = data.get('budget')
+            
+            if budget_amount is None:
+                return JsonResponse({'success': False, 'message': 'Budget amount is required.'}, status=400)
+            
+            # Assuming you have a profile model with a budget field, save the budget
+            user_profile = request.user.profile
+            user_profile.budget = budget_amount
+            user_profile.save()
+            
+            return JsonResponse({'success': True, 'message': 'Budget set successfully.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid data.'}, status=400)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 @login_required
 def add_expenses(request):
     if request.method == 'POST':

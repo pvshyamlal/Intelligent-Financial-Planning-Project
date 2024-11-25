@@ -132,7 +132,7 @@
     <!-- Top Navigation Bar -->
     <div class="nav-bar">
         <a href="javascript:void(0);" onclick="showForm('username')">Edit Username</a>
-        <a href="javascript:void(0);" onclick="showForm('email')">Add Email Address</a>
+        <a href="javascript:void(0);" onclick="showForm('budget')">Set Budget</a>
         <a href="javascript:void(0);" onclick="showForm('password')">Change Password</a>
         <a href="javascript:void(0);" onclick="showForm('profile_picture')">Add Profile Picture</a>
         <a href="javascript:void(0);" onclick="showForm('additional_info')">Additional Information</a>
@@ -157,16 +157,16 @@
             </form>
         </div>
 
-        <!-- Form to Add Email Address -->
-        <div id="email" class="profile-info">
-            <h2>Add Email Address</h2>
-            <form method="POST">
+        <!-- Form to Set Budget -->
+        <div id="budget" class="profile-info">
+            <h2>Set Budget</h2>
+            <form method="POST" onsubmit="handleBudgetSubmit(event)">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="email_input">Add Email Address</label>
-                    <input type="email" id="email_input" name="email" value="{{ user.email }}" required>
+                    <label for="budget_input">Set Monthly Budget</label>
+                    <input type="number" id="budget_input" name="budget" required placeholder="Enter your budget amount">
                 </div>
-                <button type="submit">Save Changes</button>
+                <button type="submit">Save Budget</button>
             </form>
         </div>
 
@@ -232,78 +232,69 @@
             const forms = document.querySelectorAll('.profile-info');
             forms.forEach(form => form.classList.remove('active'));
         }
-    
-        function handlePasswordSubmit(event) {
-        event.preventDefault();
-        const oldPassword = document.getElementById('old_password_input').value;
-        const newPassword = document.getElementById('password_input').value;
-        const confirmPassword = document.getElementById('confirm_password_input').value;
 
-        if (newPassword !== confirmPassword) {
-            showNotification('New password and confirm password do not match.', 'error');
-            return;
+        function handlePasswordSubmit(event) {
+            event.preventDefault();
+            const oldPassword = document.getElementById('old_password_input').value;
+            const newPassword = document.getElementById('password_input').value;
+            const confirmPassword = document.getElementById('confirm_password_input').value;
+
+            if (newPassword !== confirmPassword) {
+                showNotification('New password and confirm password do not match.', 'error');
+                return;
+            }
+
+            const data = { old_password: oldPassword, new_password: newPassword };
+
+            fetch('/change-password/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    hideProfileForm();
+                } else {
+                    showNotification(data.message || 'Failed to update password.', 'error');
+                }
+            })
+            .catch(() => {
+                showNotification('Failed to update password. Please try again.', 'error');
+            });
         }
 
-        const data = { old_password: oldPassword, new_password: newPassword };
+        function handleBudgetSubmit(event) {
+            event.preventDefault();
+            const budgetAmount = document.getElementById('budget_input').value;
 
-        fetch('/change-password/', {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification(data.message, 'success');
-                hideProfileForm();
-            } else {
-                showNotification(data.message || 'Failed to update password.', 'error');
-            }
-        })
-        .catch(() => {
-            showNotification('Failed to update password. Please try again.', 'error');
-        });
-    }
+            const data = { budget: budgetAmount };
 
-
-        
-        function handleSubmit(event, form) {
-        event.preventDefault();
-
-        const formData = new FormData(form);
-
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-        })
-        .then(response => {
-            // Check if the response is JSON
-            if (!response.ok) {
-                throw new Error('Failed to submit the form.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Handle the response
-            if (data.success) {
-                showNotification(data.message, 'success');
-                hideProfileForm(); // Optionally hide the active form
-            } else {
-                showNotification(data.message || 'An error occurred.', 'error');
-            }
-        })
-        .catch(error => {
-            // Handle any unexpected errors
-            showNotification(error.message || 'Failed to process the request.', 'error');
-        });
-    }
-
+            fetch('/set-budget/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    hideProfileForm();
+                } else {
+                    showNotification(data.message || 'Failed to set budget.', 'error');
+                }
+            })
+            .catch(() => {
+                showNotification('Failed to set budget. Please try again.', 'error');
+            });
+        }
 
         // General notification function for consistent formatting
         function showNotification(message, type) {

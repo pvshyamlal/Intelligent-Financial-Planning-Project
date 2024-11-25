@@ -161,7 +161,6 @@
                     <div class="profile-bubble" id="profile-bubble">{{ user.username|slice:":1" }}</div>
                     <div class="dropdown" id="dropdown">
                         <p>Welcome, {{ user.username }}</p>
-                        <!-- Link to Profile -->
                         <a href="{% url 'edit_profile' %}" target="content-frame">Profile</a>  <!-- Added Profile link -->
                         <!-- Logout form with POST method -->
                         <form action="{% url 'logout' %}" method="POST">
@@ -188,7 +187,7 @@
         {% endif %}
 
         <!-- Frame Area for Loading Pages -->
-        <iframe name="content-frame" class="frame-container"></iframe>
+        <iframe name="content-frame" class="frame-container" src="{% url 'dashboard' %}"></iframe> <!-- Default to dashboard -->
     </div>
 
     <script>
