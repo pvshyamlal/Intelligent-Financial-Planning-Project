@@ -155,12 +155,14 @@
     <!-- Main Content Area -->
     <div class="main-content">
         <div class="top-bar">
-            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'profile' %}">Home</a>
             {% if user.is_authenticated %}
                 <div class="profile">
                     <div class="profile-bubble" id="profile-bubble">{{ user.username|slice:":1" }}</div>
                     <div class="dropdown" id="dropdown">
                         <p>Welcome, {{ user.username }}</p>
+                        <!-- Link to Profile -->
+                        <a href="{% url 'edit_profile' %}" target="content-frame">Profile</a>  <!-- Added Profile link -->
                         <!-- Logout form with POST method -->
                         <form action="{% url 'logout' %}" method="POST">
                             {% csrf_token %}

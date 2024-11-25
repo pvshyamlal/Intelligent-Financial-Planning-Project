@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Top Navigation Bar */
+        .nav-bar {
+            width: 100%;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-bar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        .nav-bar a:hover {
+            background-color: #007bff;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        /* Top Bar for Back to Profile */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        .top-bar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+
+        /* Profile Info Section */
+        .profile-info {
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .profile-info.active {
+            display: flex;
+        }
+
+        .profile-info label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .profile-info input, .profile-info textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .profile-info button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .profile-info button:hover {
+            background-color: #0056b3;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="nav-bar">
+        <a href="javascript:void(0);" onclick="showForm('username')">Edit Username</a>
+        <a href="javascript:void(0);" onclick="showForm('email')">Add Email Address</a>
+        <a href="javascript:void(0);" onclick="showForm('password')">Change Password</a>
+        <a href="javascript:void(0);" onclick="showForm('profile_picture')">Add Profile Picture</a>
+        <a href="javascript:void(0);" onclick="showForm('additional_info')">Additional Information</a>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="top-bar">
+            <!-- Modified this to call hideProfileForm instead of a URL redirection -->
+            <a href="javascript:void(0);" onclick="hideProfileForm()">Back to Profile</a>
+        </div>
+
+        <!-- Form to Edit Username -->
+        <div id="username" class="profile-info">
+            <h2>Edit Username</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username_input">Edit Username</label>
+                    <input type="text" id="username_input" name="username" value="{{ user.username }}" required>
+                </div>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+
+        <!-- Form to Add Email Address -->
+        <div id="email" class="profile-info">
+            <h2>Add Email Address</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="email_input">Add Email Address</label>
+                    <input type="email" id="email_input" name="email" value="{{ user.email }}" required>
+                </div>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+
+        <!-- Form to Change Password -->
+        <div id="password" class="profile-info">
+            <h2>Change Password</h2>
+            <form method="POST">
+                {% csrf_token %}
+                
+                <!-- Old Password Field -->
+                <div class="form-group">
+                    <label for="old_password_input">Old Password</label>
+                    <input type="password" id="old_password_input" name="old_password" placeholder="Enter your old password" required>
+                </div>
+                
+                <!-- New Password Field -->
+                <div class="form-group">
+                    <label for="password_input">New Password</label>
+                    <input type="password" id="password_input" name="password" placeholder="Enter new password" required>
+                </div>
+                
+                <!-- Confirm New Password -->
+                <div class="form-group">
+                    <label for="confirm_password_input">Confirm New Password</label>
+                    <input type="password" id="confirm_password_input" name="confirm_password" placeholder="Confirm new password" required>
+                </div>
+                
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+
+        <!-- Form to Add Profile Picture -->
+        <div id="profile_picture" class="profile-info">
+            <h2>Add Profile Picture</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="profile_picture_input">Upload Profile Picture</label>
+                    <input type="file" id="profile_picture_input" name="profile_picture" accept="image/*">
+                </div>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+
+        <!-- Form to Add Additional Information -->
+        <div id="additional_info" class="profile-info">
+            <h2>Additional Information</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="additional_info_input">Tell us something more about yourself...</label>
+                    <textarea id="additional_info_input" name="additional_info" rows="4">{{ user.profile.additional_info }}</textarea>
+                </div>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Function to show the respective form based on the clicked navigation item
+        function showForm(formId) {
+            // Hide all profile sections
+            const forms = document.querySelectorAll('.profile-info');
+            forms.forEach(function(form) {
+                form.classList.remove('active');
+            });
+
+            // Show the selected form
+            const selectedForm = document.getElementById(formId);
+            selectedForm.classList.add('active');
+        }
+
+        // Function to hide the profile editing form and navigation bar when "Back to Profile" is clicked
+        function hideProfileForm() {
+            // Select the parent container for all forms and the navigation bar, and hide them
+            const mainContent = document.querySelector('.main-content');
+            const navBar = document.querySelector('.nav-bar');
+            mainContent.style.display = 'none'; // Hide the entire main content area
+            navBar.style.display = 'none';      // Hide the navigation bar
+        }
+    </script>
+</body>
+</html>

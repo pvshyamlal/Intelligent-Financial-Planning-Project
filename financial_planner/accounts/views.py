@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from .forms import UserRegistrationForm, ExpenseForm
 from .models import Expense
+from django.contrib.auth.hashers import check_password
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.messages import get_messages
 from django.db.models import Sum
@@ -64,6 +65,50 @@ def login_view(request):
             messages.error(request, 'Something went wrong. Please refresh the page and try again.')
 
     return render(request, 'accounts/login.html')
+
+@login_required
+def edit_profile(request):
+    # Get the current user
+    user = request.user
+
+    if request.method == 'POST':
+        # Handle the form submission to update user data
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        old_password = request.POST.get('old_password')
+        profile_picture = request.FILES.get('profile_picture')
+        additional_info = request.POST.get('additional_info')
+
+        # If the old password is provided, validate it before allowing password change
+        if old_password:
+            if check_password(old_password, user.password):  # Verify the old password
+                if password:
+                    user.set_password(password)  # Update password
+            else:
+                messages.error(request, "Old password is incorrect.")
+                return redirect('edit_profile')
+
+        # Update other fields (username, email, etc.)
+        if username:
+            user.username = username
+        if email:
+            user.email = email
+        if profile_picture:
+            user.profile.picture = profile_picture  # Assuming profile has a picture field
+        if additional_info:
+            user.profile.additional_info = additional_info  # Assuming profile has additional_info field
+
+        # Save the changes
+        user.save()
+        user.profile.save()
+
+        # Display success message
+        messages.success(request, "Your profile has been updated successfully!")
+        return redirect('profile')  # Redirect to profile page after updating
+
+    # If GET request, display the current data in the form
+    return render(request, 'accounts/edit_profile.html', {'user': user})
 
 @login_required
 def add_expenses(request):
