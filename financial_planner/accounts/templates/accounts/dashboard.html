@@ -7,24 +7,35 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+            margin: 10;
+            padding: 10px;
             display: flex;
+            gap: 10px; /* Adds space between tiles */
             flex-wrap: wrap;
-            gap: 20px;
+            background: #f4f4f4;
         }
 
-        .tile {
+        .tile1, .tile2 {
             border: 1px solid #ddd;
-            border-radius: 30px;
+            border-radius: 15px;
             padding: 20px;
-            width: calc(50% - 20px); 
-            box-shadow: 10px 15px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 5px 10px 20px rgba(255, 0, 0, 0.1);
+            background: white;
+        }
+
+        .tile1 {
+            width: 46%; /* Adjust width as needed */
+            height: 300px; /* Adjust height as needed */
+        }
+
+        .tile2 {
+            width: 46%; /* Adjust width as needed */
+            height: 300px; /* Adjust height as needed */
         }
 
         .tile h3 {
             margin: 0 0 15px;
-            font-size: 18px;
+            font-size: 20px;
             color: #333;
             text-align: center;
             font-weight: bold;
@@ -38,25 +49,48 @@
             max-width: 100%;
             height: auto;
         }
+
+        .speedometer-label {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .speedometer-label strong {
+            font-weight: bold;
+        }
     </style>
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="tile">
+    <div class="tile1">
         <h3>Expense Breakdown</h3>
         <div class="chart-container">
             <canvas id="expenseChart" width="400" height="200"></canvas>
         </div>
     </div>
 
+    <div class="tile2">
+        <h3>Expense Speedometer</h3>
+        <div class="chart-container">
+            <canvas id="speedometerChart" width="400" height="200"></canvas>
+        </div>
+        <div class="speedometer-label">
+            <span>Total Expenses: <strong>₹{{ total_expenses }}</strong></span> /
+            <span>Total Budget: <strong>₹{{ total_budget }}</strong></span>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Bar Chart Logic
             const categories = JSON.parse('{{ categories|safe }}');
             const amounts = JSON.parse('{{ amounts|safe }}');
-
+    
             const ctx = document.getElementById('expenseChart').getContext('2d');
-            const expenseChart = new Chart(ctx, {
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: categories,
@@ -64,16 +98,20 @@
                         label: 'Expense Amount (₹)',
                         data: amounts,
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.5)',
-                            'rgba(54, 162, 235, 0.5)',
-                            'rgba(255, 206, 86, 0.5)',
-                            'rgba(75, 192, 192, 0.5)'
+                            'rgba(255, 99, 132, 0.5)', // Red
+                            'rgba(54, 162, 235, 0.5)', // Blue
+                            'rgba(255, 206, 86, 0.5)', // Yellow
+                            'rgba(75, 192, 192, 0.5)', // Teal
+                            'rgba(153, 102, 255, 0.5)', // Purple
+                            'rgba(255, 159, 64, 0.5)'  // Orange
                         ],
                         borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)'
+                            'rgba(255, 99, 132, 1)', // Red
+                            'rgba(54, 162, 235, 1)', // Blue
+                            'rgba(255, 206, 86, 1)', // Yellow
+                            'rgba(75, 192, 192, 1)', // Teal
+                            'rgba(153, 102, 255, 1)', // Purple
+                            'rgba(255, 159, 64, 1)'  // Orange
                         ],
                         borderWidth: 1
                     }]
@@ -81,26 +119,113 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                        }
+                        legend: { display: true, position: 'top' }
                     },
                     scales: {
                         x: {
-                            title: {
-                                display: true,
-                                text: 'Categories'
-                            }
+                            title: { display: true, text: 'Categories' }
                         },
                         y: {
                             beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Amount (₹)'
-                            }
+                            title: { display: true, text: 'Amount (₹)' }
                         }
                     }
+                }
+            });
+    
+            // Speedometer Logic
+            const totalBudget = parseFloat('{{ total_budget|default:"0"|floatformat:2 }}');
+            const totalExpenses = parseFloat('{{ total_expenses|default:"0"|floatformat:2 }}');
+            const percentage = totalBudget > 0 ? (totalExpenses / totalBudget) : 0;
+            const needleAngle = percentage > 1 ? Math.PI : percentage * Math.PI; // Cap needle at the max angle (total budget)
+
+            const speedometerCanvas = document.getElementById('speedometerChart');
+            const ctxSpeedometer = speedometerCanvas.getContext('2d');
+
+            const width = speedometerCanvas.width;
+            const height = speedometerCanvas.height;
+
+            // Create Gradient (green -> orange -> red)
+            const gradient = ctxSpeedometer.createLinearGradient(0, height, width, height);
+            gradient.addColorStop(0, 'green'); // Green for low
+            gradient.addColorStop(0.5, 'orange'); // Orange for mid-range
+            gradient.addColorStop(1, 'red'); // Red for high
+
+            // Draw Semi-Circle Arc with Gradient
+            ctxSpeedometer.beginPath();
+            ctxSpeedometer.arc(width / 2, height, width / 2 - 10, Math.PI, 2 * Math.PI);
+            ctxSpeedometer.lineWidth = 20;
+            ctxSpeedometer.strokeStyle = gradient; // Use the gradient for the stroke
+            ctxSpeedometer.stroke();
+
+            // Draw Budget Labels
+            const labelCount = 5; // Number of labels (0, 25%, 50%, 75%, 100%)
+            const angleStep = Math.PI / labelCount;
+            ctxSpeedometer.font = '12px Arial';
+            ctxSpeedometer.textAlign = 'center';
+            ctxSpeedometer.textBaseline = 'middle';
+            for (let i = 0; i <= labelCount; i++) {
+                const angle = Math.PI + (i * angleStep);
+                const label = (i * (totalBudget / labelCount)).toFixed(0); // Budget at each interval
+                const labelX = width / 2 + (width / 2 - 30) * Math.cos(angle);
+                const labelY = height + (width / 2 - 30) * Math.sin(angle);
+                ctxSpeedometer.fillText(`₹${label}`, labelX, labelY);
+            }
+
+            // Draw Needle
+            const centerX = width / 2;
+            const centerY = height;
+            const needleLength = width / 2 - 30;
+
+            const needleX = centerX + needleLength * Math.cos(needleAngle - Math.PI);
+            const needleY = centerY + needleLength * Math.sin(needleAngle - Math.PI);
+
+            ctxSpeedometer.beginPath();
+            ctxSpeedometer.moveTo(centerX, centerY);
+            ctxSpeedometer.lineTo(needleX, needleY);
+            ctxSpeedometer.lineWidth = 4;
+            ctxSpeedometer.strokeStyle = '#000'; // Black needle
+            ctxSpeedometer.stroke();
+
+            // Draw Pivot
+            ctxSpeedometer.beginPath();
+            ctxSpeedometer.arc(centerX, centerY, 5, 0, Math.PI * 2);
+            ctxSpeedometer.fillStyle = '#000'; // Black pivot
+            ctxSpeedometer.fill();
+
+            // Tooltip variable
+            let tooltip = null;
+
+            // Add Tooltip on Hover (Only for Needle)
+            speedometerCanvas.addEventListener('mousemove', function (event) {
+                const mouseX = event.offsetX;
+                const mouseY = event.offsetY;
+                const dist = Math.sqrt(Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2));
+
+                // Check if mouse is near the needle
+                if (dist >= needleLength - 10 && dist <= needleLength + 10) {
+                    // If a tooltip is already showing, remove it
+                    if (tooltip) {
+                        tooltip.remove();
+                    }
+
+                    // Create a new tooltip element
+                    tooltip = document.createElement('div');
+                    tooltip.innerHTML = `Total Expense: ₹${totalExpenses.toFixed(2)}`;
+                    tooltip.style.position = 'absolute';
+                    tooltip.style.left = `${event.pageX + 10}px`;
+                    tooltip.style.top = `${event.pageY + 10}px`;
+                    tooltip.style.padding = '5px';
+                    tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                    tooltip.style.color = 'white';
+                    tooltip.style.borderRadius = '5px';
+                    tooltip.style.fontSize = '12px';
+                    document.body.appendChild(tooltip);
+                }
+                // If mouse leaves, remove the tooltip
+                else if (tooltip) {
+                    tooltip.remove();
+                    tooltip = null;
                 }
             });
         });

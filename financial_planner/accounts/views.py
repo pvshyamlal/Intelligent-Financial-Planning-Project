@@ -35,16 +35,22 @@ def register(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            Profile.objects.create(user=user)  # Create a profile for the user
+            user.set_password(form.cleaned_data['password'])  # Set password correctly
+            user.save()  # Save the user to the database
+
+            # Check if Profile already exists, if not, create one
+            if not hasattr(user, 'profile'):
+                Profile.objects.create(user=user)
+
             messages.success(request, 'Registration successful! Please log in.')
             return redirect('login')
     else:
         form = UserRegistrationForm()
+
     return render(request, 'accounts/register.html', {'form': form})
 
 def login_view(request):
+    # Clear stale messages
     clear_stale_messages(request)
 
     if request.method == 'POST':
@@ -52,20 +58,25 @@ def login_view(request):
         password = request.POST.get('password')
 
         try:
+            # Check if username exists
             if not User.objects.filter(username=username).exists():
                 messages.error(request, 'Username is incorrect. Please try again.')
                 return render(request, 'accounts/login.html')
 
+            # Authenticate user
             user = authenticate(request, username=username, password=password)
+
             if user is not None:
+                # Login the user
                 login(request, user)
                 messages.success(request, f'Welcome back, {user.username}!')
-                return redirect('/profile?first_login=true')
+                return redirect('/profile?first_login=true')  # Redirect to profile page after login
             else:
                 messages.error(request, 'Password is incorrect. Please try again.')
 
-        except Exception:
+        except Exception as e:
             messages.error(request, 'Something went wrong. Please refresh the page and try again.')
+            print(f"Error: {e}")
 
     return render(request, 'accounts/login.html')
 
@@ -97,19 +108,23 @@ def dashboard(request):
     # Extract categories and amounts
     categories = []
     amounts = []
+    total_expenses = user_expenses.aggregate(Sum('amount'))['amount__sum'] or 0
 
     for expense in expenses_by_category:
         category = expense['category']
         total = expense['total']
-
-        # Include all valid categories; handle "Others" separately
         if category in ['Food', 'Travel', 'Utilities', 'Entertainment', 'Others']:
             categories.append(category)
             amounts.append(float(total))  # Convert Decimal to float
 
+    # Retrieve budget from Profile
+    total_budget = request.user.profile.budget if hasattr(request.user, 'profile') else None
+
     context = {
-        'categories': json.dumps(categories),  # Serialize categories for JavaScript
-        'amounts': json.dumps(amounts),        # Serialize amounts for JavaScript
+        'categories': json.dumps(categories),
+        'amounts': json.dumps(amounts),
+        'total_expenses': total_expenses,
+        'total_budget': total_budget,
     }
     return render(request, 'accounts/dashboard.html', context)
 
