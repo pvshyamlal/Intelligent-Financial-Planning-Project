@@ -8,6 +8,7 @@ from django.contrib import messages
 from .forms import UserRegistrationForm, ExpenseForm, ProfileForm
 from .models import Expense, Profile
 from .models import Profile
+import logging
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.messages import get_messages
@@ -112,18 +113,44 @@ def dashboard(request):
     }
     return render(request, 'accounts/dashboard.html', context)
 
+logger = logging.getLogger(__name__)
+
 @login_required
 def update_username(request):
-    if request.method == "POST" and request.is_ajax():
-        new_username = request.POST.get("username")
-        if new_username:
-            # Update the user's username
-            request.user.username = new_username
-            request.user.save()
-            return JsonResponse({"success": True, "message": "Username updated successfully!"})
-        return JsonResponse({"success": False, "message": "Invalid username."})
-    return JsonResponse({"success": False, "message": "Invalid request."})
+    try:
+        if request.method == "POST" and request.is_ajax():
+            new_username = request.POST.get("username")
+            if new_username:
+                # Check if the username already exists
+                if User.objects.filter(username=new_username).exists():
+                    return JsonResponse({
+                        "success": False, 
+                        "message": "This username is already taken. Please try a different one."
+                    })
 
+                # Update the user's username
+                request.user.username = new_username
+                request.user.save()
+                return JsonResponse({
+                    "success": True, 
+                    "message": "Username updated successfully!"
+                })
+
+            return JsonResponse({
+                "success": False, 
+                "message": "Invalid username."
+            })
+        return JsonResponse({
+            "success": False, 
+            "message": "Invalid request."
+        })
+    except Exception as e:
+        logger.error(f"Error in update_username: {e}")
+        return JsonResponse({
+            "success": False, 
+            "message": "An unexpected error occurred. Please try again later."
+        })
+    
 @login_required
 def change_password(request):
     if request.method == 'POST':

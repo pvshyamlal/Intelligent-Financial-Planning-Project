@@ -231,29 +231,37 @@
     
         // Function to handle Edit Username form submission
         function handleSubmit(event, form) {
-            event.preventDefault();
-            const formData = new FormData(form);
-    
-            fetch(form.action || '/edit-username/', {
-                method: form.method || 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}', // Ensure CSRF token is included
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                    hideProfileForm();
-                } else {
-                    showNotification(data.message || 'Failed to update username.', 'error');
-                }
-            })
-            .catch(() => {
-                showNotification('Failed to update username. Please try again.', 'error');
-            });
+    event.preventDefault();
+    const formData = new FormData(form);
+
+    fetch(form.action || '/edit-username/', {
+        method: form.method || 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}', // Ensure CSRF token is included
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error(`Error: ${response.statusText}`);
         }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response Data:', data); // Debugging
+        if (data.success) {
+            showNotification(data.message, 'success');
+            hideProfileForm();
+        } else {
+            showNotification(data.message || 'Failed to update username.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Fetch Error:', error);
+        showNotification('Username already exists, Please try again.', 'error');
+    });
+}
+
     
         // Function to handle password update
         function handlePasswordSubmit(event) {
