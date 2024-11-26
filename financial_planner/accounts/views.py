@@ -183,26 +183,26 @@ def change_password(request):
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 @login_required
-@csrf_exempt  # Only if you're using non-AJAX POST requests without CSRF token in the frontend
+@csrf_exempt  # Only if necessary; ideally, use CSRF tokens
 def set_budget(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             budget_amount = data.get('budget')
-            
+
             if budget_amount is None:
                 return JsonResponse({'success': False, 'message': 'Budget amount is required.'}, status=400)
-            
+
             # Assuming you have a profile model with a budget field, save the budget
             user_profile = request.user.profile
             user_profile.budget = budget_amount
             user_profile.save()
-            
+
             return JsonResponse({'success': True, 'message': 'Budget set successfully.'})
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Invalid data.'}, status=400)
-    else:
-        return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
+
 @login_required
 def add_expenses(request):
     if request.method == 'POST':

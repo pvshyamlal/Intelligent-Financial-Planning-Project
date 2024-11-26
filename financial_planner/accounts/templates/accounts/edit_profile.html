@@ -156,7 +156,7 @@
         <!-- Form to Set Budget -->
         <div id="budget" class="profile-info">
             <h2>Set Budget</h2>
-            <form method="POST" onsubmit="handleBudgetSubmit(event)">
+            <form id="budgetForm" method="POST" action="/set-budget/" onsubmit="handleBudgetSubmit(event)">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="budget_input">Set Monthly Budget</label>
@@ -231,37 +231,67 @@
     
         // Function to handle Edit Username form submission
         function handleSubmit(event, form) {
-    event.preventDefault();
-    const formData = new FormData(form);
+        event.preventDefault();
+        const formData = new FormData(form);
 
-    fetch(form.action || '/edit-username/', {
-        method: form.method || 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}', // Ensure CSRF token is included
-        },
-    })
-    .then(response => {
-        if (!response.ok) {
-            console.error(`Error: ${response.statusText}`);
+        fetch(form.action || '/edit-username/', {
+            method: form.method || 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}', // Ensure CSRF token is included
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error(`Error: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response Data:', data); // Debugging
+            if (data.success) {
+                showNotification(data.message, 'success');
+                hideProfileForm();
+            } else {
+                showNotification(data.message || 'Failed to update username.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch Error:', error);
+            showNotification('Username already exists, Please try again.', 'error');
+        });
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Response Data:', data); // Debugging
-        if (data.success) {
-            showNotification(data.message, 'success');
-            hideProfileForm();
-        } else {
-            showNotification(data.message || 'Failed to update username.', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Fetch Error:', error);
-        showNotification('Username already exists, Please try again.', 'error');
-    });
-}
+        function handleBudgetSubmit(event) {
+        event.preventDefault();
 
+        const budgetInput = document.getElementById('budget_input').value;
+        if (!budgetInput) {
+            showNotification('Please enter a valid budget amount.', 'error');
+            return;
+        }
+
+        const data = { budget: parseFloat(budgetInput) };
+
+        fetch('/set-budget/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.message || 'Failed to update budget.', 'error');
+                }
+            })
+            .catch(() => {
+                showNotification('Failed to update budget. Please try again.', 'error');
+            });
+        }
     
         // Function to handle password update
         function handlePasswordSubmit(event) {
