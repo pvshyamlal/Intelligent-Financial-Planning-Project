@@ -25,12 +25,12 @@
 
         .tile1 {
             width: 46%; /* Adjust width as needed */
-            height: 300px; /* Adjust height as needed */
+            height: 350px; /* Adjust height as needed */
         }
 
         .tile2 {
             width: 46%; /* Adjust width as needed */
-            height: 300px; /* Adjust height as needed */
+            height: 350px; /* Adjust height as needed */
         }
 
         .tile h3 {
@@ -172,62 +172,48 @@
                 ctxSpeedometer.fillText(`₹${label}`, labelX, labelY);
             }
 
-            // Draw Needle
+            // Draw Needle (Color based on percentage)
             const centerX = width / 2;
             const centerY = height;
             const needleLength = width / 2 - 30;
 
-            const needleX = centerX + needleLength * Math.cos(needleAngle - Math.PI);
-            const needleY = centerY + needleLength * Math.sin(needleAngle - Math.PI);
+            // Determine Needle Color
+            let needleColor = 'green';
+            if (percentage > 0.8) {
+                needleColor = 'red';
+            } else if (percentage > 0.5) {
+                needleColor = 'orange';
+            }
 
+            // Calculate needle tip coordinates
+            const needleTipX = centerX + needleLength * Math.cos(needleAngle - Math.PI);
+            const needleTipY = centerY + needleLength * Math.sin(needleAngle - Math.PI);
+
+            // Define needle base width
+            const needleBaseWidth = 8;
+
+            // Calculate coordinates for the left and right corners of the needle base
+            const baseLeftX = centerX + needleBaseWidth * Math.cos(needleAngle - Math.PI + Math.PI / 2);
+            const baseLeftY = centerY + needleBaseWidth * Math.sin(needleAngle - Math.PI + Math.PI / 2);
+            const baseRightX = centerX + needleBaseWidth * Math.cos(needleAngle - Math.PI - Math.PI / 2);
+            const baseRightY = centerY + needleBaseWidth * Math.sin(needleAngle - Math.PI - Math.PI / 2);
+
+            // Draw the triangular needle
             ctxSpeedometer.beginPath();
-            ctxSpeedometer.moveTo(centerX, centerY);
-            ctxSpeedometer.lineTo(needleX, needleY);
-            ctxSpeedometer.lineWidth = 4;
-            ctxSpeedometer.strokeStyle = '#000'; // Black needle
-            ctxSpeedometer.stroke();
+            ctxSpeedometer.moveTo(baseLeftX, baseLeftY); // Left corner of the base
+            ctxSpeedometer.lineTo(baseRightX, baseRightY); // Right corner of the base
+            ctxSpeedometer.lineTo(needleTipX, needleTipY); // Needle tip
+            ctxSpeedometer.closePath();
+
+            // Fill needle with dynamic color
+            ctxSpeedometer.fillStyle = needleColor;
+            ctxSpeedometer.fill();
 
             // Draw Pivot
             ctxSpeedometer.beginPath();
             ctxSpeedometer.arc(centerX, centerY, 5, 0, Math.PI * 2);
-            ctxSpeedometer.fillStyle = '#000'; // Black pivot
+            ctxSpeedometer.fillStyle = '#333'; // Dark gray pivot
             ctxSpeedometer.fill();
-
-            // Tooltip variable
-            let tooltip = null;
-
-            // Add Tooltip on Hover (Only for Needle)
-            speedometerCanvas.addEventListener('mousemove', function (event) {
-                const mouseX = event.offsetX;
-                const mouseY = event.offsetY;
-                const dist = Math.sqrt(Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2));
-
-                // Check if mouse is near the needle
-                if (dist >= needleLength - 10 && dist <= needleLength + 10) {
-                    // If a tooltip is already showing, remove it
-                    if (tooltip) {
-                        tooltip.remove();
-                    }
-
-                    // Create a new tooltip element
-                    tooltip = document.createElement('div');
-                    tooltip.innerHTML = `Total Expense: ₹${totalExpenses.toFixed(2)}`;
-                    tooltip.style.position = 'absolute';
-                    tooltip.style.left = `${event.pageX + 10}px`;
-                    tooltip.style.top = `${event.pageY + 10}px`;
-                    tooltip.style.padding = '5px';
-                    tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-                    tooltip.style.color = 'white';
-                    tooltip.style.borderRadius = '5px';
-                    tooltip.style.fontSize = '12px';
-                    document.body.appendChild(tooltip);
-                }
-                // If mouse leaves, remove the tooltip
-                else if (tooltip) {
-                    tooltip.remove();
-                    tooltip = null;
-                }
-            });
         });
     </script>
 </body>
