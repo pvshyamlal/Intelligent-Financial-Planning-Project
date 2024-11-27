@@ -99,37 +99,34 @@ def edit_profile(request):
 
 @login_required
 def dashboard(request):
-    # Filter expenses for the logged-in user
+    # Fetch all expenses for the logged-in user
     user_expenses = Expense.objects.filter(user=request.user)
 
-    # Aggregate total amounts per category
+    # Get the latest 5 expenses for the tile
+    latest_expenses = user_expenses.order_by('-date')[:5]
+
+    # Aggregate total amounts per category for the bar graph
     expenses_by_category = user_expenses.values('category').annotate(total=Sum('amount'))
 
-    # Extract categories and amounts
-    categories = []
-    amounts = []
+    # Extract categories and amounts for Chart.js
+    categories = [item['category'] for item in expenses_by_category]
+    amounts = [float(item['total']) for item in expenses_by_category]
+
+    # Total expenses and budget for the speedometer
     total_expenses = user_expenses.aggregate(Sum('amount'))['amount__sum'] or 0
-
-    for expense in expenses_by_category:
-        category = expense['category']
-        total = expense['total']
-        if category in ['Food', 'Travel', 'Utilities', 'Entertainment', 'Others']:
-            categories.append(category)
-            amounts.append(float(total))  # Convert Decimal to float
-
-    # Retrieve budget from Profile
-    total_budget = request.user.profile.budget if hasattr(request.user, 'profile') else None
+    total_budget = request.user.profile.budget if hasattr(request.user, 'profile') else 0
 
     context = {
         'categories': json.dumps(categories),
         'amounts': json.dumps(amounts),
         'total_expenses': total_expenses,
         'total_budget': total_budget,
+        'latest_expenses': latest_expenses,  # Only latest 5 for the table tile
     }
+
     return render(request, 'accounts/dashboard.html', context)
 
 logger = logging.getLogger(__name__)
-
 @login_required
 def update_username(request):
     try:

@@ -15,7 +15,7 @@
             background: #f4f4f4;
         }
 
-        .tile1, .tile2 {
+        .tile1, .tile2, .tile3 {
             border: 1px solid #ddd;
             border-radius: 15px;
             padding: 20px;
@@ -33,7 +33,12 @@
             height: 350px; /* Adjust height as needed */
         }
 
-        .tile h3 {
+        .tile3 {
+            width: 96%; /* Full width for the table */
+        }
+
+
+        .tile1, .tile2, .tile3 h3 {
             margin: 0 0 15px;
             font-size: 20px;
             color: #333;
@@ -48,6 +53,25 @@
         canvas {
             max-width: 100%;
             height: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #5492d4;
         }
 
         .speedometer-label {
@@ -81,6 +105,28 @@
             <span>Total Expenses: <strong>₹{{ total_expenses }}</strong></span> /
             <span>Total Budget: <strong>₹{{ total_budget }}</strong></span>
         </div>
+    </div>
+
+    <div class="tile3">
+        <h3>Latest Expenses</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in latest_expenses %}
+                <tr>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.category }}</td>
+                    <td>₹{{ expense.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <script>
