@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            background: linear-gradient(135deg, #f6d365, #fda085); /* Gradient for the body */
             margin: 0;
             padding: 0;
             display: flex;
@@ -16,33 +16,33 @@
             align-items: center;
             height: 100vh;
         }
-
+    
         .form-container {
-            background: #ffffff;
+            background: linear-gradient(135deg, #a1defd, #c2e9fb); /* Cool calming gradient */
             padding: 20px 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 300px;
         }
-
+    
         .form-container h2 {
             margin-bottom: 20px;
             text-align: center;
             color: #333;
         }
-
+    
         .form-container form {
             display: flex;
             flex-direction: column;
         }
-
+    
         .form-container label {
             font-size: 14px;
             color: #333;
             margin-bottom: 5px;
             font-weight: bold;
         }
-
+    
         .form-container input {
             padding: 10px;
             margin-bottom: 15px;
@@ -50,7 +50,7 @@
             border-radius: 5px;
             font-size: 14px;
         }
-
+    
         .form-container button {
             padding: 10px;
             margin-bottom: 15px;
@@ -61,17 +61,17 @@
             font-size: 14px;
             cursor: pointer;
         }
-
+    
         .form-container button:hover {
             background-color: #0056b3;
         }
-
+    
         .top-right-button {
             position: absolute;
             top: 20px;
             right: 20px;
         }
-
+    
         button {
             outline: none;
             cursor: pointer;
@@ -89,65 +89,66 @@
             overflow: hidden;
             background: #66ff66;
             color: ghostwhite;
-            }
-
-            button span {
+        }
+    
+        button span {
             position: relative;
             z-index: 10;
             transition: color 0.4s;
-            }
-
-            button:hover span {
+        }
+    
+        button:hover span {
             color: black;
-            }
-
-            button::before,
-            button::after {
+        }
+    
+        button::before,
+        button::after {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
-            }
-
-            button::before {
+        }
+    
+        button::before {
             content: "";
             background: #000;
             width: 120%;
             left: -10%;
             transform: skew(30deg);
             transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
-            }
-
-            button:hover::before {
+        }
+    
+        button:hover::before {
             transform: translate3d(100%, 0, 0);
-            }
+        }
+    
         .top-right-button a {
             text-decoration: none;
             color: #007bff;
             font-weight: bold;
         }
-
+    
         .footer {
             text-align: center;
             margin-top: 20px;
         }
-
+    
         .footer a {
             color: #007bff;
             text-decoration: none;
             font-size: 14px;
         }
-
+    
         .footer a:hover {
             text-decoration: underline;
         }
-
+    
         .password-container {
             position: relative;
         }
-
+    
         .password-toggle {
             cursor: pointer;
             position: absolute;
@@ -155,6 +156,7 @@
             top: 17%;
         }
     </style>
+    
 </head>
 <body>
 

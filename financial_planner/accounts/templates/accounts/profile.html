@@ -152,6 +152,7 @@
     <!-- Left Navigation Bar -->
     <div class="nav-bar">
         <div class="nav-title">Menu</div>
+        <a href="{% url 'dashboard' %}" target="content-frame">Dashboard</a>
         <a href="{% url 'add_expenses' %}" target="content-frame">Add New Expenses</a>
         <a href="{% url 'view_expenses' %}" target="content-frame">View Expenses</a>
         <a href="{% url 'financial_reports' %}" target="content-frame">Financial Reports</a>
@@ -192,7 +193,7 @@
         {% endif %}
 
         <!-- Frame Area for Loading Pages -->
-        <iframe name="content-frame" class="frame-container" src="{% url 'dashboard' %}"></iframe> <!-- Default to dashboard -->
+        <iframe name="content-frame" class="frame-container" src="{% url 'notification' %}"></iframe> <!-- Default to dashboard -->
     </div>
 
     <script>

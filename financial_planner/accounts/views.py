@@ -30,6 +30,9 @@ def profile(request):
         messages.success(request, f"Welcome back, {request.user.username}!")
     return render(request, 'accounts/profile.html')
 
+def notification(request):
+    return render(request, 'accounts/notification.html')
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -216,6 +219,7 @@ def set_budget(request):
     return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
 @login_required
+
 def add_expenses(request):
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
