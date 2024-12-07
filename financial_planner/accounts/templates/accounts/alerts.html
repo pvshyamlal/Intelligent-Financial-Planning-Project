@@ -7,7 +7,7 @@
     <style>
         /* General tile styles */
         .tile {
-            width: 97%;
+            width: 94%;
             padding: 20px;
             border-radius: 10px;
             text-align: center;
@@ -20,12 +20,23 @@
 
         /* Warning tile style (Orange) */
         .warning {
-            background-color: #FF9800;
+            background-color: rgba(255, 174, 0, 0.2);
+            border: 7px solid #FF9800;
+            color: orange;
         }
 
         /* Alert tile style (Red) */
         .alert {
-            background-color: #F44336;
+            background-color: rgba(255, 0, 0, 0.2);
+            border: 7px solid red;
+            color: red;
+        }
+
+        /* Success tile style (Green) */
+        .success {
+            background-color: rgba(0, 128, 0, 0.2);
+            border: 7px solid green;
+            color: green;
         }
 
         .tile p {
@@ -34,6 +45,38 @@
 
         .tile h2 {
             font-size: 24px;
+        }
+
+        /* Style for the back link (top-right corner) */
+        .back-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 18px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .back-link{
+            font-size: 1.5em;
+            color: #000000;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            z-index: 10; /* Ensure it is above other content */
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-link:hover {
+            background-color: rgb(66, 102, 210);
+            color: #FF5722;
         }
     </style>
 </head>
@@ -44,32 +87,28 @@
     {% if food_status == 'warning' %}
     <div class="tile warning">
         <h2>Warning: Food Budget Near Limit</h2>
-        <p><strong>Food Expenses: ₹{{ total_food_expenses|floatformat:1 }}</strong></p>
-        <p><strong>Food Budget: ₹{{ total_food_budget|floatformat:1 }}</strong></p>
+        <p><strong>Food Expenses: ₹{{ total_food_expenses|floatformat:1 }} | Food Budget: ₹{{ total_food_budget|floatformat:1 }}</strong></p>
     </div>
     {% endif %}
 
     {% if entertainment_status == 'warning' %}
     <div class="tile warning">
         <h2>Warning: Entertainment Budget Near Limit</h2>
-        <p><strong>Entertainment Expenses: ₹{{ total_entertainment_expenses|floatformat:1 }}</strong></p>
-        <p><strong>Entertainment Budget: ₹{{ total_entertainment_budget|floatformat:1 }}</strong></p>
+        <p><strong>Entertainment Expenses: ₹{{ total_entertainment_expenses|floatformat:1 }} | Entertainment Budget: ₹{{ total_entertainment_budget|floatformat:1 }}</strong></p>
     </div>
     {% endif %}
 
     {% if utilities_status == 'warning' %}
     <div class="tile warning">
         <h2>Warning: Utilities Budget Near Limit</h2>
-        <p><strong>Utilities Expenses: ₹{{ total_utilities_expenses|floatformat:1 }}</strong></p>
-        <p><strong>Utilities Budget: ₹{{ total_utilities_budget|floatformat:1 }}</strong></p>
+        <p><strong>Utilities Expenses: ₹{{ total_utilities_expenses|floatformat:1 }} | Utilities Budget: ₹{{ total_utilities_budget|floatformat:1 }}</strong></p>
     </div>
     {% endif %}
 
     {% if others_status == 'warning' %}
     <div class="tile warning">
         <h2>Warning: Other Expenses Near Limit</h2>
-        <p><strong>Other Expenses: ₹{{ total_others_expenses|floatformat:1 }}</strong></p>
-        <p><strong>Other Budget: ₹{{ total_others_budget|floatformat:1 }}</strong></p>
+        <p><strong>Other Expenses: ₹{{ total_others_expenses|floatformat:1 }} | Other Budget: ₹{{ total_others_budget|floatformat:1 }}</strong></p>
     </div>
     {% endif %}
 
@@ -77,34 +116,41 @@
     {% if food_status == 'alert' %}
     <div class="tile alert">
         <h2>Alert: Food Budget Exceeded</h2>
-        <p><strong>Food Expenses: ₹{{ total_food_expenses|floatformat:1 }}</strong></p>
-        <p><strong>Food Budget: ₹{{ total_food_budget|floatformat:1 }}</strong></p>
+        <p><strong>Food Expenses: ₹{{ total_food_expenses|floatformat:1 }} | Food Budget: ₹{{ total_food_budget|floatformat:1 }}</strong></p>
     </div>
     {% endif %}
 
     {% if entertainment_status == 'alert' %}
     <div class="tile alert">
         <h2>Alert: Entertainment Budget Exceeded</h2>
-        <p><strong>Entertainment Expenses: ₹{{ total_entertainment_expenses|floatformat:1 }}</strong></p>
-        <p><strong>Entertainment Budget: ₹{{ total_entertainment_budget|floatformat:1 }}</strong></p>
+        <p><strong>Entertainment Expenses: ₹{{ total_entertainment_expenses|floatformat:1 }} | Entertainment Budget: ₹{{ total_entertainment_budget|floatformat:1 }}</strong></p>
     </div>
     {% endif %}
 
     {% if utilities_status == 'alert' %}
     <div class="tile alert">
         <h2>Alert: Utilities Budget Exceeded</h2>
-        <p><strong>Utilities Expenses: ₹{{ total_utilities_expenses|floatformat:1 }}</strong></p>
-        <p><strong>Utilities Budget: ₹{{ total_utilities_budget|floatformat:1 }}</strong></p>
+        <p><strong>Utilities Expenses: ₹{{ total_utilities_expenses|floatformat:1 }} | Utilities Budget: ₹{{ total_utilities_budget|floatformat:1 }}</strong></p>
     </div>
     {% endif %}
 
     {% if others_status == 'alert' %}
     <div class="tile alert">
         <h2>Alert: Other Expenses Exceeded</h2>
-        <p><strong>Other Expenses: ₹{{ total_others_expenses|floatformat:1 }}</strong></p>
-        <p><strong>Other Budget: ₹{{ total_others_budget|floatformat:1 }}</strong></p>
+        <p><strong>Other Expenses: ₹{{ total_others_expenses|floatformat:1 }} | Other Budget: ₹{{ total_others_budget|floatformat:1 }}</strong></p>
     </div>
     {% endif %}
+
+    <!-- Success Tile (Green) when no alert or warning exists -->
+    {% if food_status != 'warning' and food_status != 'alert' and entertainment_status != 'warning' and entertainment_status != 'alert' and utilities_status != 'warning' and utilities_status != 'alert' and others_status != 'warning' and others_status != 'alert' %}
+    <div class="tile success">
+        <h2>All Budgets Within Limits</h2>
+        <p><strong>All your expenses are within the allocated budgets. Keep up the good work!</strong></p>
+    </div>
+    {% endif %}
+
+    <!-- Back to Notifications Link -->
+    <a href="{% url 'notification' %}" class="back-link">Back to Notifications</a>
 
 </body>
 </html>
