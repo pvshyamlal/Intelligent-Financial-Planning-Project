@@ -14,6 +14,7 @@ urlpatterns = [
     path('profile/edit/', views.edit_profile, name='edit_profile'),
     path('change-password/', views.change_password, name='change_password'), 
     path('set-budget/', views.set_budget, name='set-budget'), 
+    path('alerts/', views.alerts, name='alerts'),
     path('add_expenses/', views.add_expenses, name='add_expenses'),
     path('view_expenses/', views.view_expenses, name='view_expenses'),
     path('edit_expense/<int:expense_id>/', views.edit_expense, name='edit_expense'),  # New URL for editing an expense

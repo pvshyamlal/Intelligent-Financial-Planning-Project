@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Alerts</title>
+    <style>
+        /* General tile styles */
+        .tile {
+            width: 97%;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, opacity 0.3s;
+            margin-top: 20px;
+        }
+
+        /* Warning tile style (Orange) */
+        .warning {
+            background-color: #FF9800;
+        }
+
+        /* Alert tile style (Red) */
+        .alert {
+            background-color: #F44336;
+        }
+
+        .tile p {
+            font-size: 18px;
+        }
+
+        .tile h2 {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; font-size: 3em;">Expense Alerts</h1>
+
+    <!-- Warning Tiles (Orange) -->
+    {% if food_status == 'warning' %}
+    <div class="tile warning">
+        <h2>Warning: Food Budget Near Limit</h2>
+        <p><strong>Food Expenses: ₹{{ total_food_expenses|floatformat:1 }}</strong></p>
+        <p><strong>Food Budget: ₹{{ total_food_budget|floatformat:1 }}</strong></p>
+    </div>
+    {% endif %}
+
+    {% if entertainment_status == 'warning' %}
+    <div class="tile warning">
+        <h2>Warning: Entertainment Budget Near Limit</h2>
+        <p><strong>Entertainment Expenses: ₹{{ total_entertainment_expenses|floatformat:1 }}</strong></p>
+        <p><strong>Entertainment Budget: ₹{{ total_entertainment_budget|floatformat:1 }}</strong></p>
+    </div>
+    {% endif %}
+
+    {% if utilities_status == 'warning' %}
+    <div class="tile warning">
+        <h2>Warning: Utilities Budget Near Limit</h2>
+        <p><strong>Utilities Expenses: ₹{{ total_utilities_expenses|floatformat:1 }}</strong></p>
+        <p><strong>Utilities Budget: ₹{{ total_utilities_budget|floatformat:1 }}</strong></p>
+    </div>
+    {% endif %}
+
+    {% if others_status == 'warning' %}
+    <div class="tile warning">
+        <h2>Warning: Other Expenses Near Limit</h2>
+        <p><strong>Other Expenses: ₹{{ total_others_expenses|floatformat:1 }}</strong></p>
+        <p><strong>Other Budget: ₹{{ total_others_budget|floatformat:1 }}</strong></p>
+    </div>
+    {% endif %}
+
+    <!-- Alert Tiles (Red) -->
+    {% if food_status == 'alert' %}
+    <div class="tile alert">
+        <h2>Alert: Food Budget Exceeded</h2>
+        <p><strong>Food Expenses: ₹{{ total_food_expenses|floatformat:1 }}</strong></p>
+        <p><strong>Food Budget: ₹{{ total_food_budget|floatformat:1 }}</strong></p>
+    </div>
+    {% endif %}
+
+    {% if entertainment_status == 'alert' %}
+    <div class="tile alert">
+        <h2>Alert: Entertainment Budget Exceeded</h2>
+        <p><strong>Entertainment Expenses: ₹{{ total_entertainment_expenses|floatformat:1 }}</strong></p>
+        <p><strong>Entertainment Budget: ₹{{ total_entertainment_budget|floatformat:1 }}</strong></p>
+    </div>
+    {% endif %}
+
+    {% if utilities_status == 'alert' %}
+    <div class="tile alert">
+        <h2>Alert: Utilities Budget Exceeded</h2>
+        <p><strong>Utilities Expenses: ₹{{ total_utilities_expenses|floatformat:1 }}</strong></p>
+        <p><strong>Utilities Budget: ₹{{ total_utilities_budget|floatformat:1 }}</strong></p>
+    </div>
+    {% endif %}
+
+    {% if others_status == 'alert' %}
+    <div class="tile alert">
+        <h2>Alert: Other Expenses Exceeded</h2>
+        <p><strong>Other Expenses: ₹{{ total_others_expenses|floatformat:1 }}</strong></p>
+        <p><strong>Other Budget: ₹{{ total_others_budget|floatformat:1 }}</strong></p>
+    </div>
+    {% endif %}
+
+</body>
+</html>

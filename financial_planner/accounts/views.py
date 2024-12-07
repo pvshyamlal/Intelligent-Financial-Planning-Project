@@ -91,28 +91,84 @@ def notification(request):
     context = {
         'total_budget': total_budget,
         'total_expenses': total_expenses,
-        'progress_bar_width_food': progress_bar_width_food,
-        'progress_bar_width_utilities': progress_bar_width_utilities,
-        'progress_bar_width_entertainment': progress_bar_width_entertainment,
-        'progress_bar_width_others': progress_bar_width_others,
-        'progress_bar_width_overall': overall_progress,  # Add this line for the overall progress
-        'progress_class_food': progress_class_food,
-        'progress_class_utilities': progress_class_utilities,
-        'progress_class_entertainment': progress_class_entertainment,
-        'progress_class_others': progress_class_others,
-        'progress_class_overall': progress_class_overall,  # Add this line for the overall progress class
-        'total_food_expenses': total_food_expenses,
-        'total_utilities_expenses': total_utilities_expenses,
-        'total_entertainment_expenses': total_entertainment_expenses,
-        'total_others_expenses': total_others_expenses,
         'total_food_budget': total_food_budget,
         'total_utilities_budget': total_utilities_budget,
         'total_entertainment_budget': total_entertainment_budget,
         'total_others_budget': total_others_budget,
+        'total_food_expenses': total_food_expenses,
+        'total_utilities_expenses': total_utilities_expenses,
+        'total_entertainment_expenses': total_entertainment_expenses,
+        'total_others_expenses': total_others_expenses,
+        'progress_bar_width_food': progress_bar_width_food,
+        'progress_bar_width_utilities': progress_bar_width_utilities,
+        'progress_bar_width_entertainment': progress_bar_width_entertainment,
+        'progress_bar_width_others': progress_bar_width_others,
+        'progress_bar_width_overall': overall_progress,
+        'progress_class_food': progress_class_food,
+        'progress_class_utilities': progress_class_utilities,
+        'progress_class_entertainment': progress_class_entertainment,
+        'progress_class_others': progress_class_others,
+        'progress_class_overall': progress_class_overall,
     }
 
     # Render the template with context
     return render(request, 'accounts/notification.html', context)
+
+@login_required
+def alerts(request):
+    # Fetch all expenses for the logged-in user
+    user_expenses = Expense.objects.filter(user=request.user)
+
+    # Get the user's profile and calculate total budget
+    profile = getattr(request.user, 'profile', None)
+    total_food_budget = float(profile.food_budget) if profile and profile.food_budget else 0
+    total_utilities_budget = float(profile.utilities_budget) if profile and profile.utilities_budget else 0
+    total_entertainment_budget = float(profile.entertainment_budget) if profile and profile.entertainment_budget else 0
+    total_others_budget = float(profile.others_budget) if profile and profile.others_budget else 0
+    
+    # Calculate total expenses for each category
+    total_food_expenses = user_expenses.filter(category='Food').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_utilities_expenses = user_expenses.filter(category='Utilities').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_entertainment_expenses = user_expenses.filter(category='Entertainment').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_others_expenses = user_expenses.filter(category='Others').aggregate(Sum('amount'))['amount__sum'] or 0
+
+    # Define thresholds for warning and alert status
+    warning_threshold_min = 0.70  # 70% of the budget
+    warning_threshold_max = 0.99  # 99% of the budget
+    alert_threshold = 1.0         # 100% of the budget
+
+    # Determine status for each category
+    def get_status(expenses, budget):
+        if expenses >= budget * alert_threshold:
+            return 'alert'
+        elif expenses >= budget * warning_threshold_min and expenses <= budget * warning_threshold_max:
+            return 'warning'
+        return ''
+
+    food_status = get_status(total_food_expenses, total_food_budget)
+    utilities_status = get_status(total_utilities_expenses, total_utilities_budget)
+    entertainment_status = get_status(total_entertainment_expenses, total_entertainment_budget)
+    others_status = get_status(total_others_expenses, total_others_budget)
+
+    # Pass data to the context
+    context = {
+        'total_food_budget': total_food_budget,
+        'total_utilities_budget': total_utilities_budget,
+        'total_entertainment_budget': total_entertainment_budget,
+        'total_others_budget': total_others_budget,
+        'total_food_expenses': total_food_expenses,
+        'total_utilities_expenses': total_utilities_expenses,
+        'total_entertainment_expenses': total_entertainment_expenses,
+        'total_others_expenses': total_others_expenses,
+        'food_status': food_status,
+        'utilities_status': utilities_status,
+        'entertainment_status': entertainment_status,
+        'others_status': others_status,
+    }
+
+    # Render the template with context
+    return render(request, 'accounts/alerts.html', context)
+
 
 def register(request):
     if request.method == 'POST':

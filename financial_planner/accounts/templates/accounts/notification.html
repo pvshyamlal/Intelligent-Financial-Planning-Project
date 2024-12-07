@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Notifications</title>
     <style>
-        /* Add your existing styles here, including .tile and other styles */
-        
+        /* General tile styles */
         .tile {
-            width: 80%;
-            margin: 20px auto;
+            width: 97%;
             padding: 20px;
             border-radius: 10px;
             text-align: center;
@@ -17,6 +15,8 @@
             color: white;
             background-color: #4CAF50;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, opacity 0.3s;
+            margin-top: 20px;
         }
 
         .progress-container {
@@ -65,23 +65,76 @@
             background-color: red;
         }
 
+        /* Hidden tiles styles */
+        .tile.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        .tile.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+
+        /* Grid layout for 2x2 matrix */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 50px; /* Space between tiles */
+            width: 95%;
+            margin: 2px auto;
+            visibility: hidden; /* Hidden initially */
+            opacity: 0; /* Transparent initially */
+            transition: visibility 0s, opacity 0.5s ease-in-out;
+        }
+
+        .grid-container.visible {
+            visibility: visible; /* Make visible */
+            opacity: 1; /* Fully opaque */
+        }
+
+        /* Anchor tag CSS */
+        .view-alerts-link {
+            font-size: 1.5em;
+            color: #000000;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            z-index: 10; /* Ensure it is above other content */
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .view-alerts-link:hover {
+            background-color: rgb(66, 102, 210);
+            color: #FF5722;
+        }
+
     </style>
 </head>
 <body>
+    <div>
+        <!-- Anchor Tag Positioned in the Top Right Corner -->
+        <a href="{% url 'alerts' %}" class="view-alerts-link">View Alerts and Warnings</a>
 
-    <div style="padding: 20px;">
-        <h2 style="text-align: center;">Expense Notifications</h2>
+        <h1 style="text-align: center; font-size: 3em;">Expense Notifications</h1>
 
         <!-- Tile for Total Budget and Total Expenses -->
         <div class="tile">
-            <h2>Total Budget vs Total Expenses</h2>
+            <h1>Total Budget vs Total Expenses</h1>
             <p><strong>Total Expenses: ₹{{ total_expenses|floatformat:1 }}</strong></p>
             <p><strong>Total Budget: ₹{{ total_budget|floatformat:1 }}</strong></p>
         </div>
 
         <!-- Tile for Expense vs Budget Progress Bar -->
-        <div class="tile" style="background-color: #2196F3; color: white;">
-            <h2>Expense vs Budget</h2>
+        <div class="tile" style="background-color: #2196F3; color: white; cursor: pointer; position: relative;" id="toggleButton">
+            <span style="position: absolute; top: 10px; right: 15px; font-size: 14px; font-weight: bold;">Click here For Detailed Breakdown</span>
+            <h1>Expense vs Budget</h1>
             <div class="progress-container">
                 <div class="progress-bar-budget" style="width: 100%;"></div>
                 <div class="progress-bar-expenses {{ progress_class_overall }}" style="width: {{ progress_bar_width_overall }}%;">
@@ -90,55 +143,74 @@
             </div>
             <p><strong>Total Budget: ₹{{ total_budget|floatformat:1 }}</strong></p>
         </div>
+        
 
-        <!-- Tile for Food Budget and Food Expenses -->
-        <div class="tile" style="background-color: #9C27B0;">
-            <h2>Food Expenses vs Food Budget</h2>
-            <div class="progress-container">
-                <div class="progress-bar-budget" style="width: 100%;"></div>
-                <div class="progress-bar-expenses {{ progress_class_food }}" style="width: {{ progress_bar_width_food }}%;">
-                    ₹{{ total_food_expenses|floatformat:1 }}
+        <!-- Grid container for 2x2 layout -->
+        <div class="grid-container" id="detailsGrid">
+            <!-- Tile for Food Budget and Food Expenses -->
+            <div class="tile" style="background-color: #9C27B0;" id="foodTile">
+                <h2>Food Expenses vs Food Budget</h2>
+                <div class="progress-container">
+                    <div class="progress-bar-budget" style="width: 100%;"></div>
+                    <div class="progress-bar-expenses {{ progress_class_food }}" style="width: {{ progress_bar_width_food }}%;">
+                        ₹{{ total_food_expenses|floatformat:1 }}
+                    </div>
                 </div>
+                <p><strong>Food Budget: ₹{{ total_food_budget|floatformat:1 }}</strong></p>
             </div>
-            <p><strong>Food Budget: ₹{{ total_food_budget|floatformat:1 }}</strong></p>
-        </div>
 
-        <!-- Tile for Utilities Budget and Utilities Expenses -->
-        <div class="tile" style="background-color: #FFC107;">
-            <h2>Utilities Expenses vs Utilities Budget</h2>
-            <div class="progress-container">
-                <div class="progress-bar-budget" style="width: 100%;"></div>
-                <div class="progress-bar-expenses {{ progress_class_utilities }}" style="width: {{ progress_bar_width_utilities }}%;">
-                    ₹{{ total_utilities_expenses|floatformat:1 }}
+            <!-- Tile for Utilities Budget and Utilities Expenses -->
+            <div class="tile" style="background-color: #FFC107;" id="utilitiesTile">
+                <h2>Utilities Expenses vs Utilities Budget</h2>
+                <div class="progress-container">
+                    <div class="progress-bar-budget" style="width: 100%;"></div>
+                    <div class="progress-bar-expenses {{ progress_class_utilities }}" style="width: {{ progress_bar_width_utilities }}%;">
+                        ₹{{ total_utilities_expenses|floatformat:1 }}
+                    </div>
                 </div>
+                <p><strong>Utilities Budget: ₹{{ total_utilities_budget|floatformat:1 }}</strong></p>
             </div>
-            <p><strong>Utilities Budget: ₹{{ total_utilities_budget|floatformat:1 }}</strong></p>
-        </div>
 
-        <!-- Tile for Entertainment Budget and Entertainment Expenses -->
-        <div class="tile" style="background-color: #FF5722;">
-            <h2>Entertainment Expenses vs Entertainment Budget</h2>
-            <div class="progress-container">
-                <div class="progress-bar-budget" style="width: 100%;"></div>
-                <div class="progress-bar-expenses {{ progress_class_entertainment }}" style="width: {{ progress_bar_width_entertainment }}%;">
-                    ₹{{ total_entertainment_expenses|floatformat:1 }}
+            <!-- Tile for Entertainment Budget and Entertainment Expenses -->
+            <div class="tile" style="background-color: #FF5722;" id="entertainmentTile">
+                <h2>Entertainment Expenses vs Budget</h2>
+                <div class="progress-container">
+                    <div class="progress-bar-budget" style="width: 100%;"></div>
+                    <div class="progress-bar-expenses {{ progress_class_entertainment }}" style="width: {{ progress_bar_width_entertainment }}%;">
+                        ₹{{ total_entertainment_expenses|floatformat:1 }}
+                    </div>
                 </div>
+                <p><strong>Entertainment Budget: ₹{{ total_entertainment_budget|floatformat:1 }}</strong></p>
             </div>
-            <p><strong>Entertainment Budget: ₹{{ total_entertainment_budget|floatformat:1 }}</strong></p>
-        </div>
 
-        <!-- Tile for Others Budget and Others Expenses -->
-        <div class="tile" style="background-color: #4CAF50;">
-            <h2>Others Expenses vs Others Budget</h2>
-            <div class="progress-container">
-                <div class="progress-bar-budget" style="width: 100%;"></div>
-                <div class="progress-bar-expenses {{ progress_class_others }}" style="width: {{ progress_bar_width_others }}%;">
-                    ₹{{ total_others_expenses|floatformat:1 }}
+            <!-- Tile for Others Budget and Others Expenses -->
+            <div class="tile" style="background-color: #4CAF50;" id="othersTile">
+                <h2>Others Expenses vs Others Budget</h2>
+                <div class="progress-container">
+                    <div class="progress-bar-budget" style="width: 100%;"></div>
+                    <div class="progress-bar-expenses {{ progress_class_others }}" style="width: {{ progress_bar_width_others }}%;">
+                        ₹{{ total_others_expenses|floatformat:1 }}
+                    </div>
                 </div>
+                <p><strong>Others Budget: ₹{{ total_others_budget|floatformat:1 }}</strong></p>
             </div>
-            <p><strong>Others Budget: ₹{{ total_others_budget|floatformat:1 }}</strong></p>
         </div>
     </div>
-
+    <script>
+        const toggleButton = document.getElementById('toggleButton');
+        const detailsGrid = document.getElementById('detailsGrid');
+    
+        toggleButton.addEventListener('click', () => {
+            if (detailsGrid.classList.contains('visible')) {
+                // Hide the grid and scroll to the top of the page
+                detailsGrid.classList.remove('visible');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                // Show the grid and scroll to it
+                detailsGrid.classList.add('visible');
+                detailsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    </script>
 </body>
 </html>
