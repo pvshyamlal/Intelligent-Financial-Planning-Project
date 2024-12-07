@@ -115,9 +115,19 @@ def dashboard(request):
     categories = [item['category'] for item in expenses_by_category]
     amounts = [float(item['total']) for item in expenses_by_category]
 
-    # Total expenses and budget for the speedometer
+    # Total expenses for the speedometer
     total_expenses = user_expenses.aggregate(Sum('amount'))['amount__sum'] or 0
-    total_budget = request.user.profile.budget if hasattr(request.user, 'profile') else 0
+
+    # Calculate total budget by summing the 4 fields
+    profile = getattr(request.user, 'profile', None)
+    total_budget = 0
+    if profile:
+        total_budget = (
+            (profile.food_budget or 0) +
+            (profile.entertainment_budget or 0) +
+            (profile.utilities_budget or 0) +
+            (profile.others_budget or 0)
+        )
 
     context = {
         'categories': json.dumps(categories),
@@ -197,29 +207,44 @@ def change_password(request):
 
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
-@login_required
-@csrf_exempt  # Only if necessary; ideally, use CSRF tokens
 def set_budget(request):
-    if request.method == 'POST':
+    if request.method == 'GET':
+        try:
+            user_profile = request.user.profile
+            data = {
+                'food_budget': user_profile.food_budget,
+                'entertainment_budget': user_profile.entertainment_budget,
+                'utilities_budget': user_profile.utilities_budget,
+                'others_budget': user_profile.others_budget,
+            }
+            return JsonResponse({'success': True, 'data': data})
+        except Profile.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Profile not found.'}, status=404)
+
+    elif request.method == 'POST':
         try:
             data = json.loads(request.body)
-            budget_amount = data.get('budget')
+            food_budget = data.get('food_budget')
+            entertainment_budget = data.get('entertainment_budget')
+            utilities_budget = data.get('utilities_budget')
+            others_budget = data.get('others_budget')
 
-            if budget_amount is None:
-                return JsonResponse({'success': False, 'message': 'Budget amount is required.'}, status=400)
+            if not all([food_budget is not None, entertainment_budget is not None, utilities_budget is not None, others_budget is not None]):
+                return JsonResponse({'success': False, 'message': 'All budget fields are required.'}, status=400)
 
-            # Assuming you have a profile model with a budget field, save the budget
             user_profile = request.user.profile
-            user_profile.budget = budget_amount
+            user_profile.food_budget = food_budget
+            user_profile.entertainment_budget = entertainment_budget
+            user_profile.utilities_budget = utilities_budget
+            user_profile.others_budget = others_budget
             user_profile.save()
 
-            return JsonResponse({'success': True, 'message': 'Budget set successfully.'})
+            return JsonResponse({'success': True, 'message': 'Budgets set successfully.'})
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Invalid data.'}, status=400)
     return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
 @login_required
-
 def add_expenses(request):
     if request.method == 'POST':
         form = ExpenseForm(request.POST)

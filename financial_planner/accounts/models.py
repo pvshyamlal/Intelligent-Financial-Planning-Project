@@ -3,7 +3,10 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    budget = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    food_budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    entertainment_budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    utilities_budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    others_budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
     additional_info = models.TextField(null=True, blank=True)
 

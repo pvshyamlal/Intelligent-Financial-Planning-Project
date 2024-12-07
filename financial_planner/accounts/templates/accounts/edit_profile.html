@@ -155,14 +155,50 @@
 
         <!-- Form to Set Budget -->
         <div id="budget" class="profile-info">
-            <h2>Set Budget</h2>
+            <h2>Set Budgets</h2>
             <form id="budgetForm" method="POST" action="/set-budget/" onsubmit="handleBudgetSubmit(event)">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="budget_input">Set Monthly Budget</label>
-                    <input type="number" id="budget_input" name="budget" required placeholder="Enter your budget amount">
+                    <label for="food_budget_input">Food Budget</label>
+                    <input 
+                        type="number" 
+                        id="food_budget_input" 
+                        name="food_budget" 
+                        required 
+                        placeholder="Enter food budget" 
+                        value="{{ user.profile.food_budget|default_if_none:0 }}">
                 </div>
-                <button type="submit">Save Budget</button>
+                <div class="form-group">
+                    <label for="entertainment_budget_input">Entertainment Budget</label>
+                    <input 
+                        type="number" 
+                        id="entertainment_budget_input" 
+                        name="entertainment_budget" 
+                        required 
+                        placeholder="Enter entertainment budget" 
+                        value="{{ user.profile.entertainment_budget|default_if_none:0 }}">
+                </div>
+                <div class="form-group">
+                    <label for="utilities_budget_input">Utilities Budget</label>
+                    <input 
+                        type="number" 
+                        id="utilities_budget_input" 
+                        name="utilities_budget" 
+                        required 
+                        placeholder="Enter utilities budget" 
+                        value="{{ user.profile.utilities_budget|default_if_none:0 }}">
+                </div>
+                <div class="form-group">
+                    <label for="others_budget_input">Others Budget</label>
+                    <input 
+                        type="number" 
+                        id="others_budget_input" 
+                        name="others_budget" 
+                        required 
+                        placeholder="Enter other budgets" 
+                        value="{{ user.profile.others_budget|default_if_none:0 }}">
+                </div>
+                <button type="submit">Save Budgets</button>
             </form>
         </div>
 
@@ -264,13 +300,12 @@
         function handleBudgetSubmit(event) {
         event.preventDefault();
 
-        const budgetInput = document.getElementById('budget_input').value;
-        if (!budgetInput) {
-            showNotification('Please enter a valid budget amount.', 'error');
-            return;
-        }
-
-        const data = { budget: parseFloat(budgetInput) };
+        const data = {
+            food_budget: parseFloat(document.getElementById('food_budget_input').value),
+            entertainment_budget: parseFloat(document.getElementById('entertainment_budget_input').value),
+            utilities_budget: parseFloat(document.getElementById('utilities_budget_input').value),
+            others_budget: parseFloat(document.getElementById('others_budget_input').value),
+        };
 
         fetch('/set-budget/', {
             method: 'POST',
@@ -278,20 +313,47 @@
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+            } else {
+                showNotification(data.message || 'Failed to update budgets.', 'error');
             }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                } else {
-                    showNotification(data.message || 'Failed to update budget.', 'error');
-                }
-            })
-            .catch(() => {
-                showNotification('Failed to update budget. Please try again.', 'error');
-            });
-        }
+        .catch(() => {
+            showNotification('Failed to update budgets. Please try again.', 'error');
+        });
+    }
+
+    function loadBudgetValues() {
+        fetch('/set-budget/', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('food_budget_input').value = data.data.food_budget || 0;
+                document.getElementById('entertainment_budget_input').value = data.data.entertainment_budget || 0;
+                document.getElementById('utilities_budget_input').value = data.data.utilities_budget || 0;
+                document.getElementById('others_budget_input').value = data.data.others_budget || 0;
+            } else {
+                showNotification(data.message || 'Failed to load budgets.', 'error');
+            }
+        })
+        .catch(() => {
+            showNotification('Failed to load budgets. Please try again.', 'error');
+        });
+    }
+
+    document.getElementById('budget').addEventListener('click', loadBudgetValues);
+
+
     
         // Function to handle password update
         function handlePasswordSubmit(event) {
