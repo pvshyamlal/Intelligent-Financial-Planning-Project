@@ -30,8 +30,89 @@ def profile(request):
         messages.success(request, f"Welcome back, {request.user.username}!")
     return render(request, 'accounts/profile.html')
 
+@login_required
 def notification(request):
-    return render(request, 'accounts/notification.html')
+    # Fetch all expenses for the logged-in user
+    user_expenses = Expense.objects.filter(user=request.user)
+
+    # Calculate total expenses
+    total_expenses = user_expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+
+    # Get the user's profile and calculate total budget
+    profile = getattr(request.user, 'profile', None)
+    total_budget = 0
+    total_food_budget = profile.food_budget or 0
+    total_utilities_budget = profile.utilities_budget or 0
+    total_entertainment_budget = profile.entertainment_budget or 0
+    total_others_budget = profile.others_budget or 0
+    
+    if profile:
+        total_budget = (
+            total_food_budget +
+            total_utilities_budget +
+            total_entertainment_budget +
+            total_others_budget
+        )
+
+    # Calculate total expenses for each category
+    total_food_expenses = user_expenses.filter(category='Food').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_utilities_expenses = user_expenses.filter(category='Utilities').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_entertainment_expenses = user_expenses.filter(category='Entertainment').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_others_expenses = user_expenses.filter(category='Others').aggregate(Sum('amount'))['amount__sum'] or 0
+
+    # Calculate progress bar widths for each category
+    def calculate_progress_bar_width(expenses, budget):
+        return round((expenses / budget) * 100, 2) if budget > 0 else 0
+
+    progress_bar_width_food = calculate_progress_bar_width(total_food_expenses, total_food_budget)
+    progress_bar_width_utilities = calculate_progress_bar_width(total_utilities_expenses, total_utilities_budget)
+    progress_bar_width_entertainment = calculate_progress_bar_width(total_entertainment_expenses, total_entertainment_budget)
+    progress_bar_width_others = calculate_progress_bar_width(total_others_expenses, total_others_budget)
+
+    # Calculate overall progress for Expense vs Budget
+    overall_progress = calculate_progress_bar_width(total_expenses, total_budget)
+
+    # Determine progress classes based on the widths
+    def get_progress_class(progress_bar_width):
+        if progress_bar_width < 50:
+            return 'progress-bar-low'
+        elif progress_bar_width < 80:
+            return 'progress-bar-medium'
+        else:
+            return 'progress-bar-high'
+
+    progress_class_food = get_progress_class(progress_bar_width_food)
+    progress_class_utilities = get_progress_class(progress_bar_width_utilities)
+    progress_class_entertainment = get_progress_class(progress_bar_width_entertainment)
+    progress_class_others = get_progress_class(progress_bar_width_others)
+    progress_class_overall = get_progress_class(overall_progress)
+
+    # Pass data to the context
+    context = {
+        'total_budget': total_budget,
+        'total_expenses': total_expenses,
+        'progress_bar_width_food': progress_bar_width_food,
+        'progress_bar_width_utilities': progress_bar_width_utilities,
+        'progress_bar_width_entertainment': progress_bar_width_entertainment,
+        'progress_bar_width_others': progress_bar_width_others,
+        'progress_bar_width_overall': overall_progress,  # Add this line for the overall progress
+        'progress_class_food': progress_class_food,
+        'progress_class_utilities': progress_class_utilities,
+        'progress_class_entertainment': progress_class_entertainment,
+        'progress_class_others': progress_class_others,
+        'progress_class_overall': progress_class_overall,  # Add this line for the overall progress class
+        'total_food_expenses': total_food_expenses,
+        'total_utilities_expenses': total_utilities_expenses,
+        'total_entertainment_expenses': total_entertainment_expenses,
+        'total_others_expenses': total_others_expenses,
+        'total_food_budget': total_food_budget,
+        'total_utilities_budget': total_utilities_budget,
+        'total_entertainment_budget': total_entertainment_budget,
+        'total_others_budget': total_others_budget,
+    }
+
+    # Render the template with context
+    return render(request, 'accounts/notification.html', context)
 
 def register(request):
     if request.method == 'POST':

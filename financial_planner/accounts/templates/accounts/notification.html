@@ -3,9 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Expense Notifications</title>
+    <style>
+        /* Add your existing styles here, including .tile and other styles */
+        
+        .tile {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            color: white;
+            background-color: #4CAF50;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 30px;
+            position: relative;
+        }
+
+        .progress-bar-budget {
+            height: 100%;
+            background-color: white;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .progress-bar-expenses {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 0;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        /* CSS for different progress levels */
+        .progress-bar-low {
+            background-color: green;
+        }
+
+        .progress-bar-medium {
+            background-color: orange;
+        }
+
+        .progress-bar-high {
+            background-color: red;
+        }
+
+    </style>
 </head>
 <body>
-    <h1>Notification</h1>
+
+    <div style="padding: 20px;">
+        <h2 style="text-align: center;">Expense Notifications</h2>
+
+        <!-- Tile for Total Budget and Total Expenses -->
+        <div class="tile">
+            <h2>Total Budget vs Total Expenses</h2>
+            <p><strong>Total Expenses: ₹{{ total_expenses|floatformat:1 }}</strong></p>
+            <p><strong>Total Budget: ₹{{ total_budget|floatformat:1 }}</strong></p>
+        </div>
+
+        <!-- Tile for Expense vs Budget Progress Bar -->
+        <div class="tile" style="background-color: #2196F3; color: white;">
+            <h2>Expense vs Budget</h2>
+            <div class="progress-container">
+                <div class="progress-bar-budget" style="width: 100%;"></div>
+                <div class="progress-bar-expenses {{ progress_class_overall }}" style="width: {{ progress_bar_width_overall }}%;">
+                    ₹{{ total_expenses|floatformat:1 }}
+                </div>
+            </div>
+            <p><strong>Total Budget: ₹{{ total_budget|floatformat:1 }}</strong></p>
+        </div>
+
+        <!-- Tile for Food Budget and Food Expenses -->
+        <div class="tile" style="background-color: #9C27B0;">
+            <h2>Food Expenses vs Food Budget</h2>
+            <div class="progress-container">
+                <div class="progress-bar-budget" style="width: 100%;"></div>
+                <div class="progress-bar-expenses {{ progress_class_food }}" style="width: {{ progress_bar_width_food }}%;">
+                    ₹{{ total_food_expenses|floatformat:1 }}
+                </div>
+            </div>
+            <p><strong>Food Budget: ₹{{ total_food_budget|floatformat:1 }}</strong></p>
+        </div>
+
+        <!-- Tile for Utilities Budget and Utilities Expenses -->
+        <div class="tile" style="background-color: #FFC107;">
+            <h2>Utilities Expenses vs Utilities Budget</h2>
+            <div class="progress-container">
+                <div class="progress-bar-budget" style="width: 100%;"></div>
+                <div class="progress-bar-expenses {{ progress_class_utilities }}" style="width: {{ progress_bar_width_utilities }}%;">
+                    ₹{{ total_utilities_expenses|floatformat:1 }}
+                </div>
+            </div>
+            <p><strong>Utilities Budget: ₹{{ total_utilities_budget|floatformat:1 }}</strong></p>
+        </div>
+
+        <!-- Tile for Entertainment Budget and Entertainment Expenses -->
+        <div class="tile" style="background-color: #FF5722;">
+            <h2>Entertainment Expenses vs Entertainment Budget</h2>
+            <div class="progress-container">
+                <div class="progress-bar-budget" style="width: 100%;"></div>
+                <div class="progress-bar-expenses {{ progress_class_entertainment }}" style="width: {{ progress_bar_width_entertainment }}%;">
+                    ₹{{ total_entertainment_expenses|floatformat:1 }}
+                </div>
+            </div>
+            <p><strong>Entertainment Budget: ₹{{ total_entertainment_budget|floatformat:1 }}</strong></p>
+        </div>
+
+        <!-- Tile for Others Budget and Others Expenses -->
+        <div class="tile" style="background-color: #4CAF50;">
+            <h2>Others Expenses vs Others Budget</h2>
+            <div class="progress-container">
+                <div class="progress-bar-budget" style="width: 100%;"></div>
+                <div class="progress-bar-expenses {{ progress_class_others }}" style="width: {{ progress_bar_width_others }}%;">
+                    ₹{{ total_others_expenses|floatformat:1 }}
+                </div>
+            </div>
+            <p><strong>Others Budget: ₹{{ total_others_budget|floatformat:1 }}</strong></p>
+        </div>
+    </div>
+
 </body>
 </html>
