@@ -133,7 +133,7 @@ def alerts(request):
     total_others_expenses = user_expenses.filter(category='Others').aggregate(Sum('amount'))['amount__sum'] or 0
 
     # Define thresholds for warning and alert status
-    warning_threshold_min = 0.70  # 70% of the budget
+    warning_threshold_min = 0.60  # 70% of the budget
     warning_threshold_max = 0.99  # 99% of the budget
     alert_threshold = 1.0         # 100% of the budget
 
