@@ -401,8 +401,14 @@ def view_expenses(request):
     clear_stale_messages(request)
 
     expenses = Expense.objects.filter(user=request.user)
-    return render(request, 'accounts/view_expenses.html', {'expenses': expenses})
 
+    # Format the date to remove the comma (if needed)
+    for expense in expenses:
+        # If it's a DateField, format the date to remove the comma
+        if expense.date:
+            expense.date = expense.date.strftime('%b %d %Y')  # Format as "Dec 04 2024"
+
+    return render(request, 'accounts/view_expenses.html', {'expenses': expenses})
 @login_required
 def financial_reports(request):
     # Filter expenses for the logged-in user

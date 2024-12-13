@@ -93,10 +93,45 @@
             transform: translateY(0);
         }
 
-        /* Button for downloading PDF */
-        .download-btn {
+        /* Download dropdown */
+        .download-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 10px 0;
+            z-index: 1;
+            border-radius: 5px;
+        }
+
+        .dropdown-content button {
+            padding: 10px 20px;
+            width: 100%;
+            text-align: left;
+            background-color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropdown-content button:hover {
+            background-color: #ddd;
+        }
+
+        .dropdown:hover .dropdown-content {
             display: block;
-            margin: 20px auto;
+        }
+
+        .download-btn {
             padding: 10px 20px;
             background-color: #007bff;
             color: white;
@@ -161,8 +196,20 @@
     <!-- CSRF Token -->
     <input type="hidden" id="csrf-token" value="{% csrf_token %}">
 
-    <!-- Download Button -->
-    <button class="download-btn" id="download-pdf">Download PDF</button>
+    <!-- Download Dropdown -->
+    <div class="download-container">
+        <div class="dropdown">
+            <button class="download-btn">Download</button>
+            <div class="dropdown-content">
+                <button id="download-pdf">
+                    PDF
+                </button>
+                <button id="download-excel">
+                    Excel
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Include jsPDF Library and AutoTable Plugin -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -241,6 +288,38 @@
                 // Save the PDF
                 doc.save(`${username}_expenses_list.pdf`);
             });
+
+            // Handle Excel download
+            document.getElementById('download-excel').addEventListener('click', () => {
+                const table = document.getElementById('expenses-table');
+                let csvContent = "data:text/csv;charset=utf-8,Date,Description,Amount (INR)\n";
+
+                for (let i = 1; i < table.rows.length; i++) {
+                    const cells = table.rows[i].getElementsByTagName('td');
+                    const dateText = cells[0].textContent.trim();
+                    const formattedDate = formatDate(dateText);
+                    csvContent += `${formattedDate},${cells[1].textContent},${cells[2].textContent}\n`;
+                }
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', 'expenses_list.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Function to format the date to "Month Day Year" (e.g., "Dec 4 2024")
+            function formatDate(date) {
+                const dateParts = date.split(' ');  // Splits the date into an array like ["Dec.", "4", "2024"]
+                const month = dateParts[0].replace('.', '');  // Remove the period from month if it exists
+                const day = dateParts[1];
+                const year = dateParts[2];
+
+                // Returning the formatted date without comma between day and year
+                return `${month} ${day} ${year}`;
+            }
         });
     </script>
 </body>
