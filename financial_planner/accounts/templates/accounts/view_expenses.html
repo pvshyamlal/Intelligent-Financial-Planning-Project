@@ -142,6 +142,20 @@
         .download-btn:hover {
             background-color: #0056b3;
         }
+
+        .filter-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .filter-container button {
+            margin-left: 10px;
+            padding: 5px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -159,6 +173,18 @@
             {% endfor %}
         </div>
     {% endif %}
+
+    <!-- Dropdown for Category Filter -->
+    <div class="filter-container">
+        <label for="category-filter">Filter by Category: </label>
+        <select id="category-filter">
+            <option value="All">All Expenses</option>
+            {% for choice in categories %}
+                <option value="{{ choice }}">{{ choice }}</option>
+            {% endfor %}
+        </select>
+        <button id="filter-button">Apply Filter</button>
+    </div>
 
     <table id="expenses-table">
         <thead>
@@ -216,6 +242,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.21/jspdf.plugin.autotable.min.js"></script>
 
     <script>
+
+
         document.addEventListener('DOMContentLoaded', () => {
             const csrfToken = document.getElementById('csrf-token').value;
 
@@ -321,6 +349,107 @@
                 return `${month} ${day} ${year}`;
             }
         });
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const categoryFilter = document.getElementById('category-filter');
+    const filterButton = document.getElementById('filter-button');
+    const expensesTableBody = document.querySelector('#expenses-table tbody');
+
+    // Fetch categories from the server and populate the dropdown
+    fetch('/get_categories/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.categories) {
+                // Use Set to ensure unique categories
+                const uniqueCategories = new Set(data.categories);
+
+                // Add "All" as a default option
+                uniqueCategories.add('All');
+
+                // Clear existing options in the dropdown
+                categoryFilter.innerHTML = '';
+
+                // Populate the dropdown with unique categories
+                uniqueCategories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category; // Match category as stored in the database
+                    option.textContent = category;
+                    categoryFilter.appendChild(option);
+                });
+
+                // Set the default "All" option as selected
+                categoryFilter.value = 'All';
+            } else {
+                console.error('No categories found in the response.');
+            }
+        })
+        .catch(error => console.error('Error fetching categories:', error));
+
+    // Filter table rows dynamically
+    filterButton.addEventListener('click', () => {
+        const selectedCategory = categoryFilter.value;
+
+        fetch(`/filter_expenses?category=${encodeURIComponent(selectedCategory)}`)
+            .then(response => response.json())
+            .then(data => {
+                // Clear the existing table rows
+                expensesTableBody.innerHTML = '';
+
+                if (data.expenses && data.expenses.length > 0) {
+                    // Populate the table with filtered expenses
+                    data.expenses.forEach(expense => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${expense.date}</td>
+                            <td>${expense.description}</td>
+                            <td>${expense.amount}</td>
+                            <td class="action-buttons">
+                                <!-- Edit Button -->
+                                <a href="/edit_expense/${expense.id}">
+                                    <button class="edit-button">Edit</button>
+                                </a>
+
+                                <!-- Delete Button -->
+                                <button class="delete-button delete-expense-btn" data-id="${expense.id}">Delete</button>
+                            </td>
+                        `;
+                        expensesTableBody.appendChild(row);
+                    });
+                } else {
+                    // If no expenses found, display a "no expenses" message with center alignment
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td colspan="5" style="text-align: center; font-weight: bold; color: red;">No expenses in ${selectedCategory}</td>
+                    `;
+                    expensesTableBody.appendChild(row);
+                }
+
+                // Ensure the delete button functionality works (if using JavaScript for delete)
+                document.querySelectorAll('.delete-expense-btn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const expenseId = this.getAttribute('data-id');
+                        // Handle delete functionality (make sure backend is set for delete requests)
+                        fetch(`/delete_expense/${expenseId}/`, { method: 'DELETE' })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Remove the row from the table after successful deletion
+                                    this.closest('tr').remove();
+                                } else {
+                                    console.error('Error deleting expense:', data.error);
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                    });
+                });
+
+            })
+            .catch(error => console.error('Error fetching filtered expenses:', error));
+    });
+});
+
+
+
     </script>
 </body>
 </html>

@@ -17,6 +17,9 @@ urlpatterns = [
     path('alerts/', views.alerts, name='alerts'),
     path('add_expenses/', views.add_expenses, name='add_expenses'),
     path('view_expenses/', views.view_expenses, name='view_expenses'),
+    path('get_categories/', views.get_categories, name='get_categories'),
+    path('filter_expenses/', views.filter_expenses, name='filter_expenses'),  # Add this line
+
     path('edit_expense/<int:expense_id>/', views.edit_expense, name='edit_expense'),  # New URL for editing an expense
     path('delete_expense/<int:expense_id>/', views.delete_expense, name='delete_expense'),
     path('financial_reports/', views.financial_reports, name='financial_reports'),

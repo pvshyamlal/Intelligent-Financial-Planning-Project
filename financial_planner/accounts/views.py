@@ -399,16 +399,39 @@ def add_expenses(request):
 @login_required
 def view_expenses(request):
     clear_stale_messages(request)
-
     expenses = Expense.objects.filter(user=request.user)
+    categories = [choice[0] for choice in Expense.CATEGORY_CHOICES]
+    return render(request, 'accounts/view_expenses.html', {'expenses': expenses, 'categories': categories})
 
-    # Format the date to remove the comma (if needed)
-    for expense in expenses:
-        # If it's a DateField, format the date to remove the comma
-        if expense.date:
-            expense.date = expense.date.strftime('%b %d %Y')  # Format as "Dec 04 2024"
 
-    return render(request, 'accounts/view_expenses.html', {'expenses': expenses})
+@login_required
+def get_categories(request):
+    categories = [choice[0] for choice in Expense.CATEGORY_CHOICES]
+    return JsonResponse({'categories': categories})
+
+
+@login_required
+def filter_expenses(request):
+    category = request.GET.get('category', 'All')
+    if category == "All":
+        filtered_expenses = Expense.objects.filter(user=request.user)
+    else:
+        filtered_expenses = Expense.objects.filter(user=request.user, category=category)
+
+    # Prepare data for JSON response
+    expenses_data = [
+        {
+            "id": expense.id,
+            "date": expense.date.strftime('%b %d %Y'),
+            "description": expense.description,
+            "amount": str(expense.amount),
+            "category": expense.category,
+        }
+        for expense in filtered_expenses
+    ]
+
+    return JsonResponse({"expenses": expenses_data})
+
 
 @login_required
 def financial_reports(request):
