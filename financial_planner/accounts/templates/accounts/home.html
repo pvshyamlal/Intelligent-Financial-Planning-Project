@@ -34,6 +34,7 @@
             text-decoration: none;
             margin-left: 20px;
             font-weight: bold;
+            font-size: 18px;
         }
 
         .navbar a:hover {
@@ -46,8 +47,9 @@
             text-align: center;
             background-color: rgba(104, 141, 16, 0.91);
             color: black;
-            margin-top: 120px; /* Give some space below the fixed navbar */
+            margin-top: 270px; /* Give some space below the fixed navbar */
             padding: 20px;
+            max-height: 500px;
             max-width: 800px; /* Set max-width of the content */
             margin-left: auto; /* Center horizontally */
             margin-right: auto; /* Center horizontally */
@@ -56,12 +58,34 @@
 
         .content h1 {
             font-size: 36px;
-            margin-bottom: 10px;
+            margin-top: 70px;
+            margin-bottom: 70px;
+            color: white; /* Text color */
+            text-shadow: 0 0 5px #fff;
+            transition: text-shadow 0.3s ease-in-out;
         }
 
-        .content p {
-            font-size: 18px;
-            margin-top: 10px;
+        /* Hover effect with multiple colors */
+        .content h1:hover {
+            animation: glow 5s infinite;
+        }
+
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px #ff0000, 0 0 50px #ff0000, 0 0 75px #ff0000;
+            }
+            25% {
+                text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00, 0 0 40px #00ff00, 0 0 50px #00ff00, 0 0 75px #00ff00;
+            }
+            50% {
+                text-shadow: 0 0 10px #0000ff, 0 0 20px #0000ff, 0 0 30px #0000ff, 0 0 40px #0000ff, 0 0 50px #0000ff, 0 0 75px #0000ff;
+            }
+            75% {
+                text-shadow: 0 0 10px #ff00e1, 0 0 20px #ff00e1, 0 0 30px #ff00e1, 0 0 40px #ff00e1, 0 0 50px #ff00e1, 0 0 75px #ff00e1;
+            }
+            100% {
+                text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px #ff0000, 0 0 50px #ff0000, 0 0 75px #ff0000;
+            }
         }
     </style>
 </head>
@@ -75,7 +99,6 @@
     <!-- Main content area with title and description -->
     <div class="content">
         <h1>Welcome to Intelligent Financial Planning</h1>
-        <p>Your personal finance assistant to plan and manage your finances intelligently!</p>
     </div>
 </body>
 </html>

@@ -17,6 +17,62 @@
             height: 100vh;
         }
 
+        .inputbox {
+            position: relative;
+            width: 196px;
+            }
+
+            .inputbox input {
+            position: relative;
+            width: 100%;
+            padding: 20px 10px 10px;
+            background: transparent;
+            outline: none;
+            box-shadow: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1em;
+            letter-spacing: 0.05em;
+            transition: 0.5s;
+            z-index: 10;
+            }
+
+            .inputbox span {
+            position: absolute;
+            left: 0;
+            padding: 20px 10px 10px;
+            font-size: 1em;
+            color: #8f8f8f;
+            letter-spacing: 00.05em;
+            transition: 0.5s;
+            pointer-events: none;
+            }
+
+            .inputbox input:valid ~span,
+            .inputbox input:focus ~span {
+            color: #45f3ff;
+            transform: translateX(-10px) translateY(-34px);
+            font-size: 0,75em;
+            }
+
+            .inputbox i {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background: #0056b3;
+            border-radius: 4px;
+            transition: 0.5s;
+            pointer-events: none;
+            z-index: 9;
+            }
+
+            .inputbox input:valid ~i,
+            .inputbox input:focus ~i {
+            height: 44px;
+            }
+
         .form-container {
             background: linear-gradient(135deg, #a1defd, #c2e9fb); /* Cool calming gradient */
             padding: 20px 30px;
@@ -25,30 +81,25 @@
             width: 300px;
         }
 
-        .form-container h2 {
+        .form-container h1 {
             margin-bottom: 20px;
             text-align: center;
             color: #333;
+            font-weight: bold;
+            transition: box-shadow 10s ease; /* Smooth transition for the glow effect */
+        }
+
+        .form-container h1:hover {
+            text-shadow: 
+            0 0 10px #02f90e, 
+            0 0 40px #fa1010, 
+            0 0 75px #dcf902; /* Green glow effect */
+            color: #ffffff; /* Change text color to match the glow */
         }
 
         .form-container form {
             display: flex;
             flex-direction: column;
-        }
-
-        .form-container label {
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .form-container input {
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
         }
 
         .form-container button {
@@ -184,7 +235,7 @@
     </div>
 
     <div class="form-container">
-        <h2>Login</h2>
+        <h1>Login</h1>
 
         <!-- Messages for errors and success -->
         {% if messages %}
@@ -198,16 +249,19 @@
         <form method="post">
             {% csrf_token %}
             
-            <!-- Username Input -->
-            <label for="username">Username:</label>
-            <input type="text" name="username" required><br>
 
-            <!-- Password Input -->
-            <label for="password">Password:</label>
-            <div class="password-container">
-                <input type="password" name="password" required><br>
-                <span class="password-toggle" id="toggle-password-login">🙈</span>
-            </div>
+            <div class="inputbox">
+                <input required="required" type="text" name="username">
+                <span for="username">Username</span>
+                <i></i>
+            </div><br>
+            <!-- Username Input -->
+
+            <div class="inputbox">
+                <input required="required" type="password" name="password">
+                <span for="password">Password</span>
+                <i></i>
+            </div><br><br><br>
 
             <button type="submit"><span>Login</span></button>
         </form>

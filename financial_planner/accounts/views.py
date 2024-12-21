@@ -409,6 +409,7 @@ def view_expenses(request):
             expense.date = expense.date.strftime('%b %d %Y')  # Format as "Dec 04 2024"
 
     return render(request, 'accounts/view_expenses.html', {'expenses': expenses})
+
 @login_required
 def financial_reports(request):
     # Filter expenses for the logged-in user
@@ -446,6 +447,7 @@ def financial_reports(request):
         'average_daily_expense': average_daily_expense,
     }
     return render(request, 'accounts/financial_reports.html', context)
+
 @login_required
 def edit_expense(request, expense_id):
     expense = get_object_or_404(Expense, id=expense_id, user=request.user)
