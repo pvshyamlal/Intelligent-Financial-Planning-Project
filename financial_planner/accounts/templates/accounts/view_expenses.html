@@ -183,6 +183,16 @@
                 <option value="{{ choice }}">{{ choice }}</option>
             {% endfor %}
         </select>
+    </div>
+
+    <div class="filter-container">
+        Date Ranges:
+        <input type="date" id="start-date" placeholder="Start Date">
+        
+        <input type="date" id="end-date" placeholder="End Date">
+    </div>
+
+    <div class = "filter-container">        
         <button id="filter-button">Apply Filter</button>
     </div>
 
@@ -352,6 +362,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
     const categoryFilter = document.getElementById('category-filter');
+    const startDateInput = document.getElementById('start-date'); // Start date input
+    const endDateInput = document.getElementById('end-date'); // End date input
     const filterButton = document.getElementById('filter-button');
     const expensesTableBody = document.querySelector('#expenses-table tbody');
 
@@ -360,25 +372,19 @@
         .then(response => response.json())
         .then(data => {
             if (data.categories) {
-                // Use Set to ensure unique categories
                 const uniqueCategories = new Set(data.categories);
+                uniqueCategories.add('All'); // Add "All" as default
 
-                // Add "All" as a default option
-                uniqueCategories.add('All');
+                categoryFilter.innerHTML = ''; // Clear existing options
 
-                // Clear existing options in the dropdown
-                categoryFilter.innerHTML = '';
-
-                // Populate the dropdown with unique categories
                 uniqueCategories.forEach(category => {
                     const option = document.createElement('option');
-                    option.value = category; // Match category as stored in the database
+                    option.value = category;
                     option.textContent = category;
                     categoryFilter.appendChild(option);
                 });
 
-                // Set the default "All" option as selected
-                categoryFilter.value = 'All';
+                categoryFilter.value = 'All'; // Set default "All"
             } else {
                 console.error('No categories found in the response.');
             }
@@ -388,15 +394,29 @@
     // Filter table rows dynamically
     filterButton.addEventListener('click', () => {
         const selectedCategory = categoryFilter.value;
+        let startDate = startDateInput.value;
+        let endDate = endDateInput.value;
 
-        fetch(`/filter_expenses?category=${encodeURIComponent(selectedCategory)}`)
+        // Handle cases where no date is provided
+        if (!startDate && !endDate) {
+            // Both dates are missing, so show all expenses
+            startDate = '1900-01-01';  // Very early date to include all expenses
+            endDate = '9999-12-31';    // Very late date to include all expenses
+        } else if (!startDate) {
+            // Only end date is missing, use a far future date
+            startDate = '1900-01-01';
+        } else if (!endDate) {
+            // Only start date is missing, use a far past date
+            endDate = '9999-12-31';
+        }
+
+        // Fetch filtered expenses from the server
+        fetch(`/filter_expenses?category=${encodeURIComponent(selectedCategory)}&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`)
             .then(response => response.json())
             .then(data => {
-                // Clear the existing table rows
-                expensesTableBody.innerHTML = '';
+                expensesTableBody.innerHTML = ''; // Clear existing rows
 
                 if (data.expenses && data.expenses.length > 0) {
-                    // Populate the table with filtered expenses
                     data.expenses.forEach(expense => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
@@ -416,24 +436,23 @@
                         expensesTableBody.appendChild(row);
                     });
                 } else {
-                    // If no expenses found, display a "no expenses" message with center alignment
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td colspan="5" style="text-align: center; font-weight: bold; color: red;">No expenses in ${selectedCategory}</td>
+                        <td colspan="5" style="text-align: center; font-weight: bold; color: red;">
+                            No expenses found for "${selectedCategory}" in the selected date range.
+                        </td>
                     `;
                     expensesTableBody.appendChild(row);
                 }
 
-                // Ensure the delete button functionality works (if using JavaScript for delete)
+                // Reattach delete button functionality
                 document.querySelectorAll('.delete-expense-btn').forEach(button => {
                     button.addEventListener('click', function () {
                         const expenseId = this.getAttribute('data-id');
-                        // Handle delete functionality (make sure backend is set for delete requests)
                         fetch(`/delete_expense/${expenseId}/`, { method: 'DELETE' })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    // Remove the row from the table after successful deletion
                                     this.closest('tr').remove();
                                 } else {
                                     console.error('Error deleting expense:', data.error);
@@ -442,11 +461,14 @@
                             .catch(error => console.error('Error:', error));
                     });
                 });
-
             })
-            .catch(error => console.error('Error fetching filtered expenses:', error));
+            .catch(error => {
+                console.error('Error fetching filtered expenses:', error);
+                alert('An error occurred while fetching expenses. Please try again.');
+            });
     });
 });
+
 
 
 

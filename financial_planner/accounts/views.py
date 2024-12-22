@@ -11,6 +11,7 @@ from .models import Profile
 import logging
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.dateparse import parse_date  # Ensure this is imported
 from django.contrib.messages import get_messages
 from django.db.models import Sum
 import json
@@ -410,15 +411,27 @@ def get_categories(request):
     return JsonResponse({'categories': categories})
 
 
-@login_required
 def filter_expenses(request):
     category = request.GET.get('category', 'All')
-    if category == "All":
-        filtered_expenses = Expense.objects.filter(user=request.user)
-    else:
-        filtered_expenses = Expense.objects.filter(user=request.user, category=category)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
 
-    # Prepare data for JSON response
+    filtered_expenses = Expense.objects.filter(user=request.user)
+
+    if category != 'All':
+        filtered_expenses = filtered_expenses.filter(category=category)
+
+    if start_date:
+        start_date_parsed = parse_date(start_date)
+        if start_date_parsed:
+            filtered_expenses = filtered_expenses.filter(date__gte=start_date_parsed)
+
+    if end_date:
+        end_date_parsed = parse_date(end_date)
+        if end_date_parsed:
+            filtered_expenses = filtered_expenses.filter(date__lte=end_date_parsed)
+
+    # Prepare JSON response
     expenses_data = [
         {
             "id": expense.id,
