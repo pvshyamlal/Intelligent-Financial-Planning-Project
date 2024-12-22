@@ -22,6 +22,14 @@
             flex-direction: column;
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transform: translateX(0);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .nav-bar.hidden {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
         }
 
         .nav-bar a {
@@ -58,6 +66,12 @@
             background-color: #007bff;
             color: white;
             padding: 10px 20px;
+        }
+
+        .menu-toggle {
+            display: none; /* Hidden on desktop */
+            font-size: 24px;
+            cursor: pointer;
         }
 
         .top-bar a {
@@ -110,20 +124,20 @@
         }
 
         .dropdown a {
-        display: block;
-        padding: 8px 12px;
-        color: #ffffff;
-        font-size: 14px;
-        text-decoration: none;
-        border-radius: 5px;
-        margin-bottom: 5px;
-        background-color: #242729;
-        transition: background-color 0.3s;
+            display: block;
+            padding: 8px 12px;
+            color: #ffffff;
+            font-size: 14px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            background-color: #242729;
+            transition: background-color 0.3s;
         }
 
         .dropdown a:hover {
-        background-color: #007bff;
-        color: white;
+            background-color: #007bff;
+            color: white;
         }
 
         /* Frame Area */
@@ -146,11 +160,36 @@
         .messages p {
             margin: 0;
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-bar {
+                position: absolute;
+                height: 100vh;
+                top: 0;
+                left: 0;
+                z-index: 10;
+                transform: translateX(-100%);
+            }
+
+            .nav-bar.hidden {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: block; /* Visible on mobile */
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Left Navigation Bar -->
-    <div class="nav-bar">
+    <div class="nav-bar" id="nav-bar">
+        <button id="close-nav" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer; margin-bottom: 10px;">&times; Close</button>
         <div class="nav-title">Menu</div>
         <a href="{% url 'dashboard' %}" target="content-frame">Dashboard</a>
         <a href="{% url 'add_expenses' %}" target="content-frame">Add New Expenses</a>
@@ -161,14 +200,14 @@
     <!-- Main Content Area -->
     <div class="main-content">
         <div class="top-bar">
+            <span class="menu-toggle" id="menu-toggle">&#9776;</span>
             <a href="{% url 'profile' %}">Home</a>
             {% if user.is_authenticated %}
                 <div class="profile">
                     <div class="profile-bubble" id="profile-bubble">{{ user.username|slice:":1" }}</div>
                     <div class="dropdown" id="dropdown">
                         <p>Welcome, {{ user.username }}</p>
-                        <a href="{% url 'edit_profile' %}" target="content-frame">Profile</a>  <!-- Added Profile link -->
-                        <!-- Logout form with POST method -->
+                        <a href="{% url 'edit_profile' %}" target="content-frame">Profile</a>
                         <form action="{% url 'logout' %}" method="POST">
                             {% csrf_token %}
                             <button type="submit">Logout</button>
@@ -193,38 +232,73 @@
         {% endif %}
 
         <!-- Frame Area for Loading Pages -->
-        <iframe name="content-frame" class="frame-container" src="{% url 'notification' %}"></iframe> <!-- Default to dashboard -->
+        <iframe name="content-frame" class="frame-container" src="{% url 'notification' %}"></iframe>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const menuToggle = document.getElementById('menu-toggle');
+            const navBar = document.getElementById('nav-bar');
             const profileBubble = document.getElementById('profile-bubble');
-            const dropdown = document.getElementById('dropdown');
             const profile = document.querySelector('.profile');
             const welcomeMessage = document.getElementById('welcome-message');
-
+            const closeNav = document.getElementById('close-nav');
+    
+            // Mobile menu toggle
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function () {
+                    navBar.classList.toggle('hidden');
+                });
+            }
+    
+            // Close the navigation bar when any link in nav-bar is clicked (on mobile)
+            const navLinks = document.querySelectorAll('.nav-bar a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth <= 768) {
+                        navBar.classList.add('hidden'); // Hide navbar
+                    }
+                });
+            });
+    
+            // Profile dropdown toggle
             if (profileBubble) {
-                // Toggle dropdown visibility on click
                 profileBubble.addEventListener('click', function () {
                     profile.classList.toggle('active');
                 });
             }
-
-            // Close dropdown if clicking outside of the profile
+    
+            // Close profile dropdown when clicking outside
             document.addEventListener('click', function (event) {
                 if (!profile.contains(event.target)) {
                     profile.classList.remove('active');
                 }
             });
-
-            // Auto-hide success messages after 2 minutes
+    
+            // Close nav-bar when the close button is clicked
+            if (closeNav) {
+                closeNav.addEventListener('click', function () {
+                    navBar.classList.add('hidden'); // Use 'hidden' class for consistency
+                });
+            }
+    
+            // Auto-hide welcome message
             if (welcomeMessage) {
                 setTimeout(() => {
                     welcomeMessage.style.transition = "opacity 0.5s";
                     welcomeMessage.style.opacity = 0;
-                    setTimeout(() => welcomeMessage.remove(), 500); // Remove after fade-out
-                }, 4200); // 2 minutes
+                    setTimeout(() => welcomeMessage.remove(), 500);
+                }, 4200);
             }
+    
+            // Ensure navbar is visible on desktop and toggled on mobile
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) {
+                    navBar.classList.remove('hidden'); // Always visible on desktop
+                } else if (!navBar.classList.contains('hidden')) {
+                    navBar.classList.add('hidden'); // Hidden by default on mobile
+                }
+            });
         });
     </script>
 </body>
