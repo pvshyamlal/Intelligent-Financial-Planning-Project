@@ -1,6 +1,6 @@
 # **Intelligent Financial Planning Hub (Finance Tracker)**
 
-![Project Banner Placeholder](screenshots/banner.png) <!-- Add your banner image -->
+![Project Banner Placeholder](screenshots/banner.jpg) <!-- Add your banner image -->
 
 ## 🌟 **Overview**
 The **Intelligent Financial Planning Hub** is a feature-rich web application designed to help users manage their personal finances. Track expenses, set budgets, and generate insightful reports, all within a user-friendly and interactive interface.
