@@ -22,6 +22,7 @@ The **Intelligent Financial Planning Hub** is a feature-rich web application des
 | Django (Python) | Backend Framework         |
 | MySQL           | Database Management       |
 | jsPDF           | PDF Generation           |
+| jsCharts           | Visual Graphs and charts|
 
 ---
 
@@ -105,38 +106,49 @@ The **Intelligent Financial Planning Hub** is a feature-rich web application des
 
 ---
 
-## 🤝 **Contributing**
-1. Fork the repository.
-2. Create a branch:
-   ```bash
-   git checkout -b feature/new-feature
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add new feature"
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature/new-feature
-   ```
-5. Open a Pull Request.
-
----
-
 ## 📜 **License**
 This project is licensed under the MIT License. See the `LICENSE` file for more information.
 
 ---
 
+Here’s an updated version of the **Repository Structure** section in the README file to align with your project’s directory structure:
+
+---
+
 ### 📂 **Repository Structure**
 ```plaintext
-├── finance_tracker/
-│   ├── templates/
-│   ├── static/
-│   ├── app/
-│   ├── settings.py
-├── README.md
-├── requirements.txt
+|-- financial_planner
+    |-- accounts
+        |-- admin.py
+        |-- apps.py
+        |-- forms.py
+        |-- migrations
+        |-- models.py
+        |-- signals.py
+        |-- templates
+            |-- accounts
+                |-- add_expenses.html
+                |-- alerts.html
+                |-- dashboard.html
+                |-- edit_expense.html
+                |-- edit_profile.html
+                |-- financial_reports.html
+                |-- home.html
+                |-- login.html
+                |-- notification.html
+                |-- profile.html
+                |-- register.html
+                |-- view_expenses.html
+        |-- tests.py
+        |-- urls.py
+        |-- views.py
+        |-- __init__.py
+    |-- financial_planner
+        |-- asgi.py
+        |-- settings.py
+        |-- urls.py
+        |-- wsgi.py
+    |-- manage.py
 ```
 
 ---
