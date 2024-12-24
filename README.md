@@ -1,6 +1,6 @@
 # **Intelligent Financial Planning Hub (Finance Tracker)**
 
-![Project Banner Placeholder](screenshots/banner.png) <!-- Add your banner image -->
+![Project Banner Placeholder](financial_planner/screenshots/banner.png) <!-- Add your banner image -->
 
 ## 🌟 **Overview**
 The **Intelligent Financial Planning Hub** is a feature-rich web application designed to help users manage their personal finances. Track expenses, set budgets, and generate insightful reports, all within a user-friendly and interactive interface.
@@ -96,43 +96,43 @@ Here’s the updated **Screenshots** section with the required Markdown line for
 
 ### 📸 **Screenshots For Key Functionalities**
 1. **Home Page**  
-   ![Home Page](screenshots/banner.png)
+   ![Home Page](financial_planner/screenshots/banner.png)
 
 2. **Registration Page**  
-   ![Registration Page](screenshots/registration_page.png)
+   ![Registration Page](financial_planner/screenshots/registration_page.png)
 
 3. **Login Page**  
-   ![Login Page](screenshots/login_page.png)
+   ![Login Page](financial_planner/screenshots/login_page.png)
 
 4. **Dashboard**  
-   ![Dashboard](screenshots/dashboard.png)
+   ![Dashboard](financial_planner/screenshots/dashboard.png)
 
 5. **Add Expense Form**  
-   ![Add Expense Form](screenshots/add_expense_form.png)
+   ![Add Expense Form](financial_planner/screenshots/add_expense_form.png)
 
 6. **View Expenses Page**  
-   ![View Expenses Page](screenshots/view_expenses.png)
+   ![View Expenses Page](financial_planner/screenshots/view_expenses.png)
 
 7. **Edit Expense Form**  
-   ![Edit Expense Form](screenshots/edit_expense_form.png)
+   ![Edit Expense Form](financial_planner/screenshots/edit_expense_form.png)
 
 8. **Financial Reports with Visualizations**  
-   ![Financial Reports](screenshots/financial_reports.png)
+   ![Financial Reports](financial_planner/screenshots/financial_reports.png)
 
 9. **PDF Export Functionality**  
-   ![PDF Export](screenshots/pdf_export.png)
+   ![PDF Export](financial_planner/screenshots/pdf_export.png)
 
 10. **Budget Alerts (Under Budget)**  
-    ![Under Budget](screenshots/under_budget.png)
+    ![Under Budget](financial_planner/screenshots/under_budget.png)
 
 11. **Budget Alerts (Over Budget)**  
-    ![Over Budget](screenshots/over_budget.png)
+    ![Over Budget](financial_planner/screenshots/over_budget.png)
 
 12. **Expense Breakdown Bar Chart**  
-    ![Bar Chart](screenshots/bar_chart.png)
+    ![Bar Chart](financial_planner/screenshots/bar_chart.png)
 
 13. **Expense Speedometer (Budget Gauge)**  
-    ![Speedometer](screenshots/speedometer.png)
+    ![Speedometer](financial_planner/screenshots/speedometer.png)
 
 ---
 
