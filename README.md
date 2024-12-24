@@ -90,19 +90,91 @@ The **Intelligent Financial Planning Hub** is a feature-rich web application des
    - Receive alerts for overspending.
 
 ---
+Here’s the updated **Screenshots** section with the required Markdown line for each entry:
 
-## 📸 **Screenshots**
-### Add screenshots using Markdown:
-```markdown
-![Screenshot 1](screenshots/home.png)
-![Screenshot 2](screenshots/dashboard.png)
-```
-### Suggested Sections for Screenshots:
-1. **Home Page**
-2. **Login/Registration**
-3. **Expense Management**
-4. **Financial Reports**
-5. **Budget Alerts**
+---
+
+### 📸 **Screenshots**
+
+1. **Home Page**  
+   ```markdown
+   ![Home Page](screenshots/home.png)
+   ```
+
+2. **Registration Page**  
+   ```markdown
+   ![Registration Page](screenshots/registration_page.png)
+   ```
+
+3. **Login Page**  
+   ```markdown
+   ![Login Page](screenshots/login_page.png)
+   ```
+
+4. **Dashboard**  
+   ```markdown
+   ![Dashboard](screenshots/dashboard.png)
+   ```
+
+5. **Add Expense Form**  
+   ```markdown
+   ![Add Expense Form](screenshots/add_expense_form.png)
+   ```
+
+6. **View Expenses Page**  
+   ```markdown
+   ![View Expenses Page](screenshots/view_expenses.png)
+   ```
+
+7. **Edit Expense Form**  
+   ```markdown
+   ![Edit Expense Form](screenshots/edit_expense_form.png)
+   ```
+
+8. **Financial Reports with Visualizations**  
+   ```markdown
+   ![Financial Reports](screenshots/financial_reports.png)
+   ```
+
+9. **PDF Export Functionality**  
+   ```markdown
+   ![PDF Export](screenshots/pdf_export.png)
+   ```
+
+10. **Budget Alerts (Under Budget)**  
+    ```markdown
+    ![Under Budget](screenshots/under_budget.png)
+    ```
+
+11. **Budget Alerts (Near Budget)**  
+    ```markdown
+    ![Near Budget](screenshots/near_budget.png)
+    ```
+
+12. **Budget Alerts (Over Budget)**  
+    ```markdown
+    ![Over Budget](screenshots/over_budget.png)
+    ```
+
+13. **Expense Breakdown Bar Chart**  
+    ```markdown
+    ![Bar Chart](screenshots/bar_chart.png)
+    ```
+
+14. **Expense Speedometer (Budget Gauge)**  
+    ```markdown
+    ![Speedometer](screenshots/speedometer.png)
+    ```
+
+15. **Profile Page**  
+    ```markdown
+    ![Profile Page](screenshots/profile.png)
+    ```
+
+16. **Edit Profile Form**  
+    ```markdown
+    ![Edit Profile](screenshots/edit_profile.png)
+    ```
 
 ---
 
