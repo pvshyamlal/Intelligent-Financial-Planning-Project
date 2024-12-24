@@ -1,0 +1,7 @@
+Django==4.2.6
+mysqlclient==2.1.1
+django-crispy-forms==1.14.0
+matplotlib==3.7.2
+pandas==1.5.3
+numpy==1.24.3
+jsPDF==2.5.1  # Used on the frontend, listed here for reference

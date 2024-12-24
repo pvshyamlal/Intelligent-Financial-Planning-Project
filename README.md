@@ -36,8 +36,8 @@ The **Intelligent Financial Planning Hub** is a feature-rich web application des
 ### Steps to Run the Project
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <project-folder>
+   git clone https://github.com/pvshyamlal/Intelligent-Financial-Planning-Project
+   cd financial_planner
    ```
 2. Create and activate a virtual environment:
    ```bash
@@ -94,11 +94,11 @@ Here’s the updated **Screenshots** section with the required Markdown line for
 
 ---
 
-### 📸 **Screenshots**
+### 📸 **Screenshots For Key Functionalities**
 
 1. **Home Page**  
    ```markdown
-   ![Home Page](screenshots/home.png)
+   ![Home Page](screenshots/banner.png)
    ```
 
 2. **Registration Page**  
@@ -146,44 +146,25 @@ Here’s the updated **Screenshots** section with the required Markdown line for
     ![Under Budget](screenshots/under_budget.png)
     ```
 
-11. **Budget Alerts (Near Budget)**  
-    ```markdown
-    ![Near Budget](screenshots/near_budget.png)
-    ```
-
-12. **Budget Alerts (Over Budget)**  
+11. **Budget Alerts (Over Budget)**  
     ```markdown
     ![Over Budget](screenshots/over_budget.png)
     ```
 
-13. **Expense Breakdown Bar Chart**  
+12. **Expense Breakdown Bar Chart**  
     ```markdown
     ![Bar Chart](screenshots/bar_chart.png)
     ```
 
-14. **Expense Speedometer (Budget Gauge)**  
+13. **Expense Speedometer (Budget Gauge)**  
     ```markdown
     ![Speedometer](screenshots/speedometer.png)
-    ```
-
-15. **Profile Page**  
-    ```markdown
-    ![Profile Page](screenshots/profile.png)
-    ```
-
-16. **Edit Profile Form**  
-    ```markdown
-    ![Edit Profile](screenshots/edit_profile.png)
     ```
 
 ---
 
 ## 📜 **License**
 This project is licensed under the MIT License. See the `LICENSE` file for more information.
-
----
-
-Here’s an updated version of the **Repository Structure** section in the README file to align with your project’s directory structure:
 
 ---
 
@@ -214,7 +195,6 @@ Here’s an updated version of the **Repository Structure** section in the READM
         |-- tests.py
         |-- urls.py
         |-- views.py
-        |-- __init__.py
     |-- financial_planner
         |-- asgi.py
         |-- settings.py
@@ -224,20 +204,3 @@ Here’s an updated version of the **Repository Structure** section in the READM
 ```
 
 ---
-
-## 🌟 **Acknowledgments**
-Thanks to all contributors and open-source resources that made this project possible.
-
----
-
-### How to Add This to Your Repository
-1. Save this content as `README.md`.
-2. Include screenshots in the `screenshots/` folder within your project directory.
-3. Use the following commands to update your repository:
-   ```bash
-   git add README.md screenshots/
-   git commit -m "Add a visually appealing README with screenshots"
-   git push origin main
-   ```
-
-Would you like me to save this as a downloadable `README.md` file for your convenience?
