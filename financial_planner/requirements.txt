@@ -5,3 +5,5 @@ matplotlib==3.7.2
 pandas==1.5.3
 numpy==1.24.3
 jsPDF==2.5.1  # Used on the frontend, listed here for reference
+djangorestframework
+djangorestframework-simplejwt
